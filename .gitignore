@@ -1,3 +1,6 @@
+# Datasets
+*.raw
+
 # Prerequisites
 *.d
 
