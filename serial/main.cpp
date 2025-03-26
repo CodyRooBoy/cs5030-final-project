@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <chrono>
 
 bool visibility_line_exists(short (*data)[6000], short x1, short y1, short x2, short y2);
 std::vector<std::pair<int, int>> visibility_path(int x1, int y1, int x2, int y2);
@@ -25,7 +26,49 @@ int main() {
 
     short (*output_points)[6000] = new short[6000][6000];
 
-    std::cout << "Visible points: " << visible_points(data, output_points, 0, 0) << std::endl;
+    short x1, y1;
+    std::cout << "Enter x1: ";
+    std::cin >> x1;
+    std::cout << "Enter y1: ";
+    std::cin >> y1;
+
+    auto start_time = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Visible points: " << visible_points(data, output_points, x1, y1) << std::endl;
+
+    auto end_time = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> duration = end_time - start_time;
+
+    std::cout << "Time taken for visible_points: " << duration.count() << " seconds" << std::endl;
+
+    // for (int i = 0; i < 6000; i += 1) {
+    //     for (int j = 0; j < 6000; j += 1) {
+    //         visible_points(data, output_points, i, j);
+    //         if (i % 100 == 0 && j % 100 == 0) {
+    //             std::cout << "Progress: " << i << " " << j << std::endl;
+    //         }
+    //     }
+    // }
+
+    const char* output_filename = "output_visibility.raw";
+    std::ofstream out_file(output_filename, std::ios::binary);
+    if (!out_file) {
+        std::cerr << "Error opening output file\n";
+        return 1;
+    }
+
+    for (int i = 0; i < 6000; ++i) {
+        for (int j = 0; j < 6000; ++j) {
+            int visibility_count = static_cast<int>(output_points[i][j]);
+            out_file.write(reinterpret_cast<char*>(&visibility_count), sizeof(int));
+        }
+    }
+
+    out_file.close();
+
+    delete[] data;
+    delete[] output_points;
 
     return 0;
 }
@@ -34,6 +77,16 @@ short visible_points(short (*data)[6000], short (*output_points)[6000], short x1
     short visible_points = 0;
     for (int i = y1; i < y1 + 100 && i < 6000; ++i) {
         for (int j = x1 + 1; j < x1 + 100 && j < 6000; ++j) {
+            if (visibility_line_exists(data, x1, y1, j, i)) {
+                output_points[x1][y1]++;
+                output_points[j][i]++;
+                visible_points++;
+            }
+        }
+    }
+
+    for (int i = y1 + 1; i < y1 + 100 && i < 6000; ++i) {
+        for (int j = x1 - 1; j >= x1 - 100 && j >= 0; --j) {
             if (visibility_line_exists(data, x1, y1, j, i)) {
                 output_points[x1][y1]++;
                 output_points[j][i]++;
