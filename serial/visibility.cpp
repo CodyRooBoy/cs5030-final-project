@@ -16,11 +16,12 @@ short visible_points(short (*data)[6000], short (*output_points)[6000], short x1
 }
 
 bool visibility_line_exists(short (*data)[6000], short x1, short y1, short x2, short y2) {
-    int slope = visibility_line_slope(data[x1][y1], data[x2][y2], x1, y1, x2, y2);
+    float slope = visibility_line_slope(data[x1][y1], data[x2][y2], x1, y1, x2, y2);
+	// std::cout << "Slope from (" << x1 << ", " << y1 << ") to (" << x2 << ", " << y2 << "): " << slope << std::endl;
     return(visibility_path(data, slope, static_cast<int>(x1), static_cast<int>(y1), static_cast<int>(x2), static_cast<int>(y2)));
 }
 
-bool visibility_path(short (*data)[6000], int slope, int x1, int y1, int x2, int y2)
+bool visibility_path(short (*data)[6000], float slope, int x1, int y1, int x2, int y2)
 {
     std::pair<int, int> point;
     short altitude = data[x1][y1];
@@ -148,9 +149,8 @@ bool visibility_path(short (*data)[6000], int slope, int x1, int y1, int x2, int
     return true;
 }
 
-int visibility_line_slope(short starting_altitude, short ending_altitude, int x1, int y1, int x2, int y2) {
-    int dx = x2 - x1, dy = y2 - y1;
-    return (ending_altitude - starting_altitude) * 1000 / (dx * dx + dy * dy);
+float visibility_line_slope(short starting_altitude, short ending_altitude, short x1, short y1, short x2, short y2) {
+    return (ending_altitude - starting_altitude) / sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 }
 
 std::vector<std::pair<int, int>> pixelList(int x0, int y0, int maxX, int maxY, int radius) {

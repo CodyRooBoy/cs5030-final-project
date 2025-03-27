@@ -1,7 +1,7 @@
 all: serial
 
 serial: main.o visibility.o
-	g++ main.o visibility.o -o serial
+	g++ main.o visibility.o -o serial.exe
 
 main.o: main.cpp visibility.hpp
 	g++ -c main.cpp -o main.o
