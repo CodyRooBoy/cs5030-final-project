@@ -10,6 +10,7 @@ bool visibility_path(short (*data)[6000], float slope, int x1, int y1, int x2, i
 float visibility_line_slope(short starting_altitude, short ending_altitude, short x1, short y1, short x2, short y2);
 void printGrid(short (*data)[6000], int rows, int cols);
 short visible_points(short (*data)[6000], short (*output_points)[6000], short x1, short y1);
+std::vector<std::pair<int, int>> pixelList(int x0, int y0, int maxX, int maxY, int radius = 100);
 
 int main() {
     const char* filename = "srtm_14_04_6000x6000_short16.raw";
@@ -76,23 +77,32 @@ int main() {
 
 short visible_points(short (*data)[6000], short (*output_points)[6000], short x1, short y1) {
     short visible_points = 0;
-    for (int i = y1; i < y1 + 100 && i < 6000; ++i) {
-        for (int j = x1 + 1; j < x1 + 100 && j < 6000; ++j) {
-            if (visibility_line_exists(data, x1, y1, j, i)) {
-                output_points[x1][y1]++;
-                output_points[j][i]++;
-                visible_points++;
-            }
-        }
-    }
+    // for (int i = y1; i < y1 + 100 && i < 6000; ++i) {
+    //     for (int j = x1 + 1; j < x1 + 100 && j < 6000; ++j) {
+    //         if (visibility_line_exists(data, x1, y1, j, i)) {
+    //             output_points[x1][y1]++;
+    //             output_points[j][i]++;
+    //             visible_points++;
+    //         }
+    //     }
+    // }
 
-    for (int i = y1 + 1; i < y1 + 100 && i < 6000; ++i) {
-        for (int j = x1 - 1; j >= x1 - 100 && j >= 0; --j) {
-            if (visibility_line_exists(data, x1, y1, j, i)) {
-                output_points[x1][y1]++;
-                output_points[j][i]++;
-                visible_points++;
-            }
+    // for (int i = y1 + 1; i < y1 + 100 && i < 6000; ++i) {
+    //     for (int j = x1 - 1; j >= x1 - 100 && j >= 0; --j) {
+    //         if (visibility_line_exists(data, x1, y1, j, i)) {
+    //             output_points[x1][y1]++;
+    //             output_points[j][i]++;
+    //             visible_points++;
+    //         }
+    //     }
+    // }
+
+    std::vector<std::pair<int, int>> pixels = pixelList(x1, y1, 6000, 6000, 100);
+    for (const auto& pixel : pixels) {
+        if (visibility_line_exists(data, x1, y1, pixel.first, pixel.second)) {
+            output_points[x1][y1]++;
+            output_points[pixel.first][pixel.second]++;
+            visible_points++;
         }
     }
 
@@ -131,6 +141,22 @@ bool visibility_line_exists(short (*data)[6000], short x1, short y1, short x2, s
 float visibility_line_slope(short starting_altitude, short ending_altitude, short x1, short y1, short x2, short y2) {
     // technically this does not return a float, potentially change later but this is a good enough approximation for right now
     return (ending_altitude - starting_altitude) / sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+}
+
+std::vector<std::pair<int, int>> pixelList(int x0, int y0, int maxX, int maxY, int radius) {
+    std::vector<std::pair<int, int>> pixels;
+
+    for (int x = x0; x <= std::min(x0 + radius, maxX - 1); x++) {
+        for (int y = y0; y <= std::min(y0 + radius, maxY - 1); y++) {
+            if (x == x0 && y <= y0) continue;
+
+            if ((x - x0) * (x - x0) + (y - y0) * (y - y0) <= radius * radius) {
+                pixels.emplace_back(x, y);
+            }
+        }
+    }
+
+    return pixels;
 }
 
 bool visibility_path(short (*data)[6000], float slope, int x1, int y1, int x2, int y2)
