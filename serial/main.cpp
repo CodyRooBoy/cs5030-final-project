@@ -6,8 +6,8 @@
 #include <chrono>
 
 bool visibility_line_exists(short (*data)[6000], short x1, short y1, short x2, short y2);
-std::vector<std::pair<int, int>> visibility_path(int x1, int y1, int x2, int y2);
-float visibility_line_slope(short starting_altitude, short ending_altitude, int path_length);
+bool visibility_path(short (*data)[6000], float slope, int x1, int y1, int x2, int y2);
+float visibility_line_slope(short starting_altitude, short ending_altitude, short x1, short y1, short x2, short y2);
 void printGrid(short (*data)[6000], int rows, int cols);
 short visible_points(short (*data)[6000], short (*output_points)[6000], short x1, short y1);
 
@@ -34,22 +34,23 @@ int main() {
 
     auto start_time = std::chrono::high_resolution_clock::now();
 
-    std::cout << "Visible points: " << visible_points(data, output_points, x1, y1) << std::endl;
+    // std::cout << "Visible points: " << visible_points(data, output_points, x1, y1) << std::endl;
+
+    for (int i = 0; i < 6000; i += 1) {
+        auto start_time_2 = std::chrono::high_resolution_clock::now();
+        for (int j = 0; j < 6000; j += 1) {
+            visible_points(data, output_points, i, j);
+        }
+        auto end_time_2 = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> duration_2 = end_time_2 - start_time_2;
+        std::cout << "Time taken for row " << i << ": " << duration_2.count() << " seconds" << std::endl;
+    }
 
     auto end_time = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> duration = end_time - start_time;
 
     std::cout << "Time taken for visible_points: " << duration.count() << " seconds" << std::endl;
-
-    // for (int i = 0; i < 6000; i += 1) {
-    //     for (int j = 0; j < 6000; j += 1) {
-    //         visible_points(data, output_points, i, j);
-    //         if (i % 100 == 0 && j % 100 == 0) {
-    //             std::cout << "Progress: " << i << " " << j << std::endl;
-    //         }
-    //     }
-    // }
 
     const char* output_filename = "output_visibility.raw";
     std::ofstream out_file(output_filename, std::ios::binary);
@@ -108,32 +109,34 @@ void printGrid(short (*data)[6000], int rows, int cols) {
 }
 
 bool visibility_line_exists(short (*data)[6000], short x1, short y1, short x2, short y2) {
-    std::vector<std::pair<int, int>> path = visibility_path(static_cast<int>(x1), static_cast<int>(y1), static_cast<int>(x2), static_cast<int>(y2));
-    float slope = visibility_line_slope(data[x1][y1], data[x2][y2], path.size() - 1);
+    float slope = visibility_line_slope(data[x1][y1], data[x2][y2], x1, y1, x2, y2);
     // std::cout << "Slope: " << slope << std::endl;
-    float starting_altitude = static_cast<float>(data[x1][y1]);
+    return(visibility_path(data, slope, static_cast<int>(x1), static_cast<int>(y1), static_cast<int>(x2), static_cast<int>(y2)));
+    // float starting_altitude = static_cast<float>(data[x1][y1]);
     // std::cout << "(" << path[0].first << ", " << path[0].second << ") : " << data[path[0].first][path[0].second] << std::endl;
-    path.erase(path.begin());
-    for (const auto& point : path) {
-        // std::cout << "(" << point.first << ", " << point.second << ") : " << data[point.first][point.second] << std::endl;
-        if (static_cast<float>(data[point.first][point.second]) < (starting_altitude + slope)) {
-            starting_altitude = starting_altitude + slope;
-        }
-        else {
-            return false;
-        }
-    }
+    // path.erase(path.begin());
+    // for (const auto& point : path) {
+    //     // std::cout << "(" << point.first << ", " << point.second << ") : " << data[point.first][point.second] << std::endl;
+    //     if (static_cast<float>(data[point.first][point.second]) < (starting_altitude + slope)) {
+    //         starting_altitude = starting_altitude + slope;
+    //     }
+    //     else {
+    //         return false;
+    //     }
+    // }
 
-    return true;
+    // return true;
 }
 
-float visibility_line_slope(short starting_altitude, short ending_altitude, int path_length) {
-    return (ending_altitude - starting_altitude) / path_length;
+float visibility_line_slope(short starting_altitude, short ending_altitude, short x1, short y1, short x2, short y2) {
+    // technically this does not return a float, potentially change later but this is a good enough approximation for right now
+    return (ending_altitude - starting_altitude) / sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 }
 
-std::vector<std::pair<int, int>> visibility_path(int x1, int y1, int x2, int y2)
+bool visibility_path(short (*data)[6000], float slope, int x1, int y1, int x2, int y2)
 {
-    std::vector<std::pair<int, int>> path;
+    std::pair<int, int> point;
+    short altitude = data[x1][y1];
 
 	// Compute the differences between start and end points
 	int dx = x2 - x1;
@@ -168,7 +171,15 @@ std::vector<std::pair<int, int>> visibility_path(int x1, int y1, int x2, int y2)
 		for (int i = 0; i <= abs_dx; i++)
 		{
             std::pair<int, int> point = std::make_pair(x, y);
-            path.push_back(point);
+            // std::cout << point.first << " " << point.second << std::endl;
+            if (x != x1 && y != y1) {
+                if (static_cast<float>(data[point.first][point.second]) < (altitude + slope)) {
+                    altitude = altitude + slope;
+                }
+                else {
+                    return false;
+                }
+            }
 
 			// Print the current coordinate
 			// std::cout << "(" << x << "," << y << ")" << std::endl;
@@ -217,7 +228,15 @@ std::vector<std::pair<int, int>> visibility_path(int x1, int y1, int x2, int y2)
 		for (int i = 0; i <= abs_dy; i++)
 		{
             std::pair<int, int> point = std::make_pair(x, y);
-            path.push_back(point);
+            // std::cout << point.first << " " << point.second << std::endl;
+            if (x != x1 && y != y1) {
+                if (static_cast<float>(data[point.first][point.second]) < (altitude + slope)) {
+                    altitude = altitude + slope;
+                }
+                else {
+                    return false;
+                }
+            }
 
 			// Print the current coordinate
 			// std::cout << "(" << x << "," << y << ")" << std::endl;
@@ -247,5 +266,5 @@ std::vector<std::pair<int, int>> visibility_path(int x1, int y1, int x2, int y2)
 		}
 	}
 
-    return path;
+    return true;
 }
