@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH -o ./%j/slurmjob-%j.out-%N
 #SBATCH -e ./%j/slurmjob-%j.err-%N
-#SBATCH --account=group-name
+#SBATCH --account=usucs5030
 #SBATCH --partition=kingspeak
 
 # set up scratch directory
