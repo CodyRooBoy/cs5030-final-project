@@ -27,15 +27,7 @@ int main() {
 
     short (*output_points)[6000] = new short[6000][6000];
 
-    short x1, y1;
-    std::cout << "Enter x1: ";
-    std::cin >> x1;
-    std::cout << "Enter y1: ";
-    std::cin >> y1;
-
     auto start_time = std::chrono::high_resolution_clock::now();
-
-    // std::cout << "Visible points: " << visible_points(data, output_points, x1, y1) << std::endl;
 
     for (int i = 0; i < 6000; i += 1) {
         auto start_time_2 = std::chrono::high_resolution_clock::now();
@@ -77,25 +69,6 @@ int main() {
 
 short visible_points(short (*data)[6000], short (*output_points)[6000], short x1, short y1) {
     short visible_points = 0;
-    // for (int i = y1; i < y1 + 100 && i < 6000; ++i) {
-    //     for (int j = x1 + 1; j < x1 + 100 && j < 6000; ++j) {
-    //         if (visibility_line_exists(data, x1, y1, j, i)) {
-    //             output_points[x1][y1]++;
-    //             output_points[j][i]++;
-    //             visible_points++;
-    //         }
-    //     }
-    // }
-
-    // for (int i = y1 + 1; i < y1 + 100 && i < 6000; ++i) {
-    //     for (int j = x1 - 1; j >= x1 - 100 && j >= 0; --j) {
-    //         if (visibility_line_exists(data, x1, y1, j, i)) {
-    //             output_points[x1][y1]++;
-    //             output_points[j][i]++;
-    //             visible_points++;
-    //         }
-    //     }
-    // }
 
     std::vector<std::pair<int, int>> pixels = pixelList(x1, y1, 6000, 6000, 100);
     for (const auto& pixel : pixels) {
@@ -120,26 +93,10 @@ void printGrid(short (*data)[6000], int rows, int cols) {
 
 bool visibility_line_exists(short (*data)[6000], short x1, short y1, short x2, short y2) {
     float slope = visibility_line_slope(data[x1][y1], data[x2][y2], x1, y1, x2, y2);
-    // std::cout << "Slope: " << slope << std::endl;
     return(visibility_path(data, slope, static_cast<int>(x1), static_cast<int>(y1), static_cast<int>(x2), static_cast<int>(y2)));
-    // float starting_altitude = static_cast<float>(data[x1][y1]);
-    // std::cout << "(" << path[0].first << ", " << path[0].second << ") : " << data[path[0].first][path[0].second] << std::endl;
-    // path.erase(path.begin());
-    // for (const auto& point : path) {
-    //     // std::cout << "(" << point.first << ", " << point.second << ") : " << data[point.first][point.second] << std::endl;
-    //     if (static_cast<float>(data[point.first][point.second]) < (starting_altitude + slope)) {
-    //         starting_altitude = starting_altitude + slope;
-    //     }
-    //     else {
-    //         return false;
-    //     }
-    // }
-
-    // return true;
 }
 
 float visibility_line_slope(short starting_altitude, short ending_altitude, short x1, short y1, short x2, short y2) {
-    // technically this does not return a float, potentially change later but this is a good enough approximation for right now
     return (ending_altitude - starting_altitude) / sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 }
 
@@ -197,7 +154,6 @@ bool visibility_path(short (*data)[6000], float slope, int x1, int y1, int x2, i
 		for (int i = 0; i <= abs_dx; i++)
 		{
             std::pair<int, int> point = std::make_pair(x, y);
-            // std::cout << point.first << " " << point.second << std::endl;
             if (x != x1 && y != y1) {
                 if (static_cast<float>(data[point.first][point.second]) < (altitude + slope)) {
                     altitude = altitude + slope;
@@ -254,7 +210,6 @@ bool visibility_path(short (*data)[6000], float slope, int x1, int y1, int x2, i
 		for (int i = 0; i <= abs_dy; i++)
 		{
             std::pair<int, int> point = std::make_pair(x, y);
-            // std::cout << point.first << " " << point.second << std::endl;
             if (x != x1 && y != y1) {
                 if (static_cast<float>(data[point.first][point.second]) < (altitude + slope)) {
                     altitude = altitude + slope;
