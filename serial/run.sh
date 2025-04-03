@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH -o ./%j/slurmjob-%j.out-%N
 #SBATCH -e ./%j/slurmjob-%j.err-%N
-#SBATCH --account=group-name
+#SBATCH --account=usucs5030
 #SBATCH --partition=kingspeak
 
 # set up scratch directory
@@ -11,6 +11,17 @@ SCRDIR=/scratch/general/vast/$USER/$SLURM_JOB_ID
 mkdir -p $SCRDIR
 
 cp main.cpp $SCRDIR
+cp visibility.cpp $SCRDIR
+cp visibility.h $SCRDIR
+cp Makefile $SCRDIR
+cp strm_14_04_6000x6000_short16.raw $SCRDIR
+
+# compile the program
+make
+
+# run the program
+./serial.exe
+=======
 cp strm_14_04_6000x6000_short16.raw $SCRDIR
 
 # compile the program
