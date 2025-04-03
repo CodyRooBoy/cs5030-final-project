@@ -14,24 +14,15 @@ cp main.cpp $SCRDIR
 cp visibility.cpp $SCRDIR
 cp visibility.h $SCRDIR
 cp Makefile $SCRDIR
-cp strm_14_04_6000x6000_short16.raw $SCRDIR
+cp 1000x1000.raw $SCRDIR
 
 # compile the program
 make
 
 # run the program
-./serial.exe
-=======
-cp strm_14_04_6000x6000_short16.raw $SCRDIR
+./serial.exe 1000x1000.raw output_visibility.raw 1000 1000
 
-# compile the program
-g++ main.cpp -o serial
-
-# run the program
-./serial
-
-# copy output back
-cp ./output_visibility.raw.raw $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
+cp ./output_visibility.raw $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
 
 # Remove the directory in scatch
 rm -rf $SCRDIR
