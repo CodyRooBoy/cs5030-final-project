@@ -4,8 +4,8 @@
 #include "visibility.hpp"
 
 int main(int argc, char* argv[]) {
-	if (argc < 4) {
-		std::cerr << "Missing Arguments. Format in the following order: <filename> <rows> <columns>" << std::endl;
+	if (argc < 5) {
+		std::cerr << "Missing Arguments. Format in the following order: <input_filename> <output_filename> <rows> <columns>" << std::endl;
 		return 1;
 	}
 
@@ -16,8 +16,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-	int rows = std::stoi(argv[2]);
-	int columns = std::stoi(argv[3]);
+	int rows = std::stoi(argv[3]);
+	int columns = std::stoi(argv[4]);
 
 	short** data = new short*[rows];
 	for (int i = 0; i < rows; ++i) {
@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Time taken for visible_points: " << duration.count() << " seconds" << std::endl;
 
-    const char* output_filename = "output_visibility.raw";
+    const char* output_filename = argv[2];
     std::ofstream out_file(output_filename, std::ios::binary);
     if (!out_file) {
         std::cerr << "Error opening output file\n";
