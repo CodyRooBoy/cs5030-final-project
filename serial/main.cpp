@@ -3,26 +3,41 @@
 
 #include "visibility.hpp"
 
-int main() {
-    const char* filename = "srtm_14_04_6000x6000_short16.raw";
+int main(int argc, char* argv[]) {
+	if (argc < 4) {
+		std::cerr << "Missing Arguments. Format in the following order: <filename> <rows> <columns>" << std::endl;
+		return 1;
+	}
+
+    const char* filename = argv[1];
     std::ifstream file(filename, std::ios::binary);
     if (!file) {
         std::cerr << "Error opening file\n";
         return 1;
     }
 
-    short (*data)[6000] = new short[6000][6000];
-    file.read(reinterpret_cast<char*>(data), 6000 * 6000 * sizeof(short));
+	int rows = std::stoi(argv[2]);
+	int columns = std::stoi(argv[3]);
+
+	short** data = new short*[rows];
+	for (int i = 0; i < rows; ++i) {
+        data[i] = new short[columns];
+    }
+
+    file.read(reinterpret_cast<char*>(*data), rows * columns * sizeof(short));
     file.close();
 
-    short (*output_points)[6000] = new short[6000][6000];
+	short** output_points = new short*[rows];
+	for (int i = 0; i < rows; ++i) {
+        output_points[i] = new short[columns];
+    }
 
     auto start_time = std::chrono::high_resolution_clock::now();
 
-    for (int i = 0; i < 6000; i += 1) {
+    for (int i = 0; i < rows; i += 1) {
         auto start_time_2 = std::chrono::high_resolution_clock::now();
-        for (int j = 0; j < 6000; j += 1) {
-            visible_points(data, output_points, i, j);
+        for (int j = 0; j < columns; j += 1) {
+            visible_points(data, output_points, rows, columns, i, j);
         }
         auto end_time_2 = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> duration_2 = end_time_2 - start_time_2;
@@ -42,8 +57,8 @@ int main() {
         return 1;
     }
 
-    for (int i = 0; i < 6000; ++i) {
-        for (int j = 0; j < 6000; ++j) {
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < columns; ++j) {
             int visibility_count = static_cast<int>(output_points[i][j]);
             out_file.write(reinterpret_cast<char*>(&visibility_count), sizeof(int));
         }

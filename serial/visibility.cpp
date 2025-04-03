@@ -1,9 +1,9 @@
 #include "visibility.hpp"
 
-short visible_points(short (*data)[6000], short (*output_points)[6000], short x1, short y1) {
+short visible_points(short **data, short **output_points, int rows, int columns, short x1, short y1) {
     short visible_points = 0;
 
-    std::vector<std::pair<int, int>> pixels = pixelList(x1, y1, 6000, 6000, 100);
+    std::vector<std::pair<int, int>> pixels = pixelList(x1, y1, rows, columns, 100);
     for (const auto& pixel : pixels) {
         if (visibility_line_exists(data, x1, y1, pixel.first, pixel.second)) {
             output_points[x1][y1]++;
@@ -15,13 +15,12 @@ short visible_points(short (*data)[6000], short (*output_points)[6000], short x1
     return visible_points;
 }
 
-bool visibility_line_exists(short (*data)[6000], short x1, short y1, short x2, short y2) {
+bool visibility_line_exists(short **data, short x1, short y1, short x2, short y2) {
     float slope = visibility_line_slope(data[x1][y1], data[x2][y2], x1, y1, x2, y2);
-	// std::cout << "Slope from (" << x1 << ", " << y1 << ") to (" << x2 << ", " << y2 << "): " << slope << std::endl;
     return(visibility_path(data, slope, static_cast<int>(x1), static_cast<int>(y1), static_cast<int>(x2), static_cast<int>(y2)));
 }
 
-bool visibility_path(short (*data)[6000], float slope, int x1, int y1, int x2, int y2)
+bool visibility_path(short **data, float slope, int x1, int y1, int x2, int y2)
 {
     std::pair<int, int> point;
     short altitude = data[x1][y1];
