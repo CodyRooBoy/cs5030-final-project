@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 int main(int argc, char* argv[]) {
 
@@ -28,7 +29,7 @@ int main(int argc, char* argv[]) {
 
     // Read in input file
     int input_file_size = input_height * input_width;
-    std::vector<short> input_data(input_file_size);
+    std::vector<uint16_t> input_data(input_file_size);
     input_file.read(reinterpret_cast<char*>(input_data.data()), input_file_size * 2);
 
 
@@ -43,7 +44,8 @@ int main(int argc, char* argv[]) {
 
     // Build smaller data structure
     int output_file_size = output_height * output_width;
-    std::vector<short> output_data(output_file_size);
+    std::vector<uint16_t> output_data(output_file_size);
+    printf("\noutput size: %d\n",output_data.size());
 
     // Fill output data structure with subsections of input data
     for (int x = 0; x < output_height; x++) {
@@ -53,6 +55,7 @@ int main(int argc, char* argv[]) {
             output_data[output_location] = input_data[input_location];
         }
     }
+    
 
     // // Print out 10x10 matrix of output data
     // printf("\n");
@@ -65,12 +68,12 @@ int main(int argc, char* argv[]) {
 
 
     // Place output data in file
-    std::ofstream output_file(output_name);
+    std::ofstream output_file(output_name, std::ios::binary);
     if (!output_file) {
         std::cerr << "Error opening file for writing.\n";
         return 1;
     }
-    output_file.write(reinterpret_cast<const char*>(output_data.data()), output_file_size);
+    output_file.write(reinterpret_cast<const char*>(output_data.data()), output_file_size * 2);
 
 
     return 0;
