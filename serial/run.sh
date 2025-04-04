@@ -12,7 +12,7 @@ mkdir -p $SCRDIR
 
 cp main.cpp $SCRDIR
 cp visibility.cpp $SCRDIR
-cp visibility.h $SCRDIR
+cp visibility.hpp $SCRDIR
 cp Makefile $SCRDIR
 cp 1000x1000.raw $SCRDIR
 
@@ -24,5 +24,5 @@ make
 
 cp ./output_visibility.raw $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
 
-# Remove the directory in scatch
+# Remove the directory in sratch
 rm -rf $SCRDIR
