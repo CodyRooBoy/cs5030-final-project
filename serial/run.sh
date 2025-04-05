@@ -6,6 +6,14 @@
 #SBATCH --account=usucs5030
 #SBATCH --partition=kingspeak
 
+# Set up the run
+DATA_SIZE=1000
+OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_serial.raw"
+INPUT_NAME="input_${DATA_SIZE}x${DATA_SIZE}.raw"
+
+# Generate input file with resize tool
+../tools/resize ../tools/6000x6000.raw 6000 6000 $INPUT_NAME $DATA_SIZE $DATA_SIZE
+
 # set up scratch directory
 SCRDIR=/scratch/general/vast/$USER/$SLURM_JOB_ID
 mkdir -p $SCRDIR
@@ -14,16 +22,17 @@ cp main.cpp $SCRDIR
 cp visibility.cpp $SCRDIR
 cp visibility.hpp $SCRDIR
 cp Makefile $SCRDIR
-cp 1000x1000.raw $SCRDIR
+cp $INPUT_NAME $SCRDIR
+rm $INPUT_NAME
 cd $SCRDIR
 
 # compile the program
 make
 
 # run the program
-./serial.exe 1000x1000.raw output_visibility.raw 1000 1000
+./serial.exe $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE
 
-cp ./output_visibility.raw $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
+cp $OUTPUT_NAME $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
 
 # Remove the directory in sratch
 rm -rf $SCRDIR

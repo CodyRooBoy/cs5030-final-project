@@ -7,13 +7,13 @@
 #SBATCH --partition=kingspeak
 
 # Set up the run
-NUM_THREADS=5
-DATA_SIZE=100
+NUM_THREADS=15
+DATA_SIZE=1000
 OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_with_${NUM_THREADS}.raw"
 INPUT_NAME="input_${DATA_SIZE}x${DATA_SIZE}.raw"
 
 # Generate input file with resize tool
-/../tools/resize ../tools/6000x6000.raw 6000 6000 $INPUT_NAME $DATA_SIZE $DATA_SIZE
+../tools/resize ../tools/6000x6000.raw 6000 6000 $INPUT_NAME $DATA_SIZE $DATA_SIZE
 
 # set up scratch directory
 SCRDIR=/scratch/general/vast/$USER/$SLURM_JOB_ID
@@ -24,6 +24,7 @@ cp visibility.cpp $SCRDIR
 cp visibility.hpp $SCRDIR
 cp Makefile $SCRDIR
 cp $INPUT_NAME $SCRDIR
+rm $INPUT_NAME
 cd $SCRDIR
 
 # compile the program
