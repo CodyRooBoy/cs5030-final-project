@@ -18,6 +18,9 @@ int main(int argc, char* argv[]) {
 	int width = std::stoi(argv[4]);
     int num_threads = std::stoi(argv[5]);
 
+    // Printing run info for logging purposes
+    printf("Running a Threaded program with data size %d x %d and %d threads", height, width, num_threads);
+
     // Initializing input and output memory space
 	std::vector<uint16_t> altitude_data(height * width);
     std::vector<uint32_t> visibility_data(height * width);
@@ -68,14 +71,14 @@ int main(int argc, char* argv[]) {
     std::chrono::duration<double> duration = end_time - start_time;
     std::cout << "Time taken for visible_points: " << duration.count() << " seconds" << std::endl;
 
-    // Printing out the visibility_data
-    for (int x = 0; x < 30; x++) {
-        for (int y = 0; y < 30; y++) {
-            std::cout << visibility_data.at(y + x * width) << " ";
-        }
-        std::cout << "\n";
-    }
-    std::cout << "\n";
+    // // Printing out the visibility_data
+    // for (int x = 0; x < 30; x++) {
+    //     for (int y = 0; y < 30; y++) {
+    //         std::cout << visibility_data.at(y + x * width) << " ";
+    //     }
+    //     std::cout << "\n";
+    // }
+    // std::cout << "\n";
 
 
     // Writing out visiblity data

@@ -6,6 +6,16 @@
 #SBATCH --account=usucs5030
 #SBATCH --partition=kingspeak
 
+# Set up the run
+$NUM_THREADS = 5
+$DATA_SIZE = 100
+$OUTPUT_NAME = "output_" + $DATA_SIZE + "x" + $DATA_SIZE + "_with_" + $NUM_THREADS + "_threads.raw"  
+$INPUT_NAME = "input_" + $DATA_SIZE + "x" + $DATA_SIZE + ".raw"
+
+# Generate input file with resize tool
+../tools/resize 6000x6000.raw 6000 6000 $INPUT_NAME $DATA_SIZE $DATA_SIZE
+mv ../tools/$INPUT_NAME .
+
 # set up scratch directory
 SCRDIR=/scratch/general/vast/$USER/$SLURM_JOB_ID
 mkdir -p $SCRDIR
@@ -14,16 +24,16 @@ cp main.cpp $SCRDIR
 cp visibility.cpp $SCRDIR
 cp visibility.hpp $SCRDIR
 cp Makefile $SCRDIR
-cp 1000x1000.raw $SCRDIR
+cp $INPUT_NAME $SCRDIR
 cd $SCRDIR
 
 # compile the program
 make
 
 # run the program
-./threaded.exe 1000x1000.raw output_1000x1000.raw 1000 1000 15
+./threaded.exe $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE $NUM_THREADS
 
-cp ./output_1000x1000.raw $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
+cp $OUTPUT_NAME $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
 
 # Remove the directory in sratch
 rm -rf $SCRDIR

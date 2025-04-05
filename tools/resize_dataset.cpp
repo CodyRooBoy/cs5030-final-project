@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
     // Build smaller data structure
     int output_file_size = output_height * output_width;
     std::vector<uint16_t> output_data(output_file_size);
-    printf("\noutput size: %d\n",output_data.size());
+    // printf("\noutput size: %d\n",output_data.size());
 
     // Fill output data structure with subsections of input data
     for (int x = 0; x < output_height; x++) {
