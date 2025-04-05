@@ -15,6 +15,7 @@ cp visibility.cpp $SCRDIR
 cp visibility.hpp $SCRDIR
 cp Makefile $SCRDIR
 cp 1000x1000.raw $SCRDIR
+cd $SCRDIR
 
 # compile the program
 make

@@ -1,29 +1,31 @@
 #include "visibility.hpp"
 
-short visible_points(short **data, short **output_points, int rows, int columns, short x1, short y1) {
-    short visible_points = 0;
+void visible_points(std::vector<uint16_t> &altitude_data, std::vector<uint32_t> &visibility_data, int height, int width, short x1, short y1) {
+    // short visible_points = 0;
 
-    std::vector<std::pair<int, int>> pixels = pixelList(x1, y1, rows, columns, 100);
+    std::vector<std::pair<int, int>> pixels = pixelList(x1, y1, height, width, 100);
     for (const auto& pixel : pixels) {
-        if (visibility_line_exists(data, x1, y1, pixel.first, pixel.second)) {
-            output_points[x1][y1]++;
-            output_points[pixel.first][pixel.second]++;
-            visible_points++;
+        if (visibility_line_exists(altitude_data, x1, y1, pixel.first, pixel.second, width)) {
+            visibility_data[y1 * width + x1]++; ///// Check which one here
+            visibility_data[pixel.second * width + pixel.first]++;
+
+            // visible_points++;
         }
+		// std::cout << "x: " << pixel.first << ", y: " << pixel.second << " -- " << visibility_data[pixel.second * width + pixel.first] << std::endl;
     }
 
-    return visible_points;
+    // return visible_points;
 }
 
-bool visibility_line_exists(short **data, short x1, short y1, short x2, short y2) {
-    float slope = visibility_line_slope(data[x1][y1], data[x2][y2], x1, y1, x2, y2);
-    return(visibility_path(data, slope, static_cast<int>(x1), static_cast<int>(y1), static_cast<int>(x2), static_cast<int>(y2)));
+bool visibility_line_exists(std::vector<uint16_t> &altitude_data, short x1, short y1, short x2, short y2, int width) {
+    float slope = visibility_line_slope(altitude_data[y1 * width + x1], altitude_data[y2 * width + x2], x1, y1, x2, y2);
+    return(visibility_path(altitude_data, slope, static_cast<int>(x1), static_cast<int>(y1), static_cast<int>(x2), static_cast<int>(y2), width));
 }
 
-bool visibility_path(short **data, float slope, int x1, int y1, int x2, int y2)
+bool visibility_path(std::vector<uint16_t> &altitude_data, float slope, int x1, int y1, int x2, int y2, int width)
 {
     std::pair<int, int> point;
-    short altitude = data[x1][y1];
+    short altitude = altitude_data[y1 * width + x1];
 
 	// Compute the differences between start and end points
 	int dx = x2 - x1;
@@ -59,7 +61,7 @@ bool visibility_path(short **data, float slope, int x1, int y1, int x2, int y2)
 		{
             std::pair<int, int> point = std::make_pair(x, y);
             if (x != x1 && y != y1 && x != x2 && y != y2) {
-                if ((data[point.first][point.second]) < (altitude + slope)) {
+                if ((altitude_data[point.second * width + point.first]) < (altitude + slope)) {
                     altitude = altitude + slope;
                 }
                 else {
@@ -112,7 +114,7 @@ bool visibility_path(short **data, float slope, int x1, int y1, int x2, int y2)
 		{
             std::pair<int, int> point = std::make_pair(x, y);
             if (x != x1 && y != y1 && x != x2 && y != y2) {
-                if ((data[point.first][point.second]) < (altitude + slope)) {
+                if ((altitude_data[point.second * width + point.first]) < (altitude + slope)) {
                     altitude = altitude + slope;
                 }
                 else {
@@ -166,7 +168,7 @@ std::vector<std::pair<int, int>> pixelList(int x0, int y0, int maxX, int maxY, i
     // std::cout << "starting_y: " << starting_y << std::endl;
     // std::cout << "stopping_y: " << stopping_y << std::endl;
     // std::cout << "starting_x: " << starting_x << std::endl;
-    // std::cout << "stopping_x: " << stopping_x << std::endl; 
+    // std::cout << "stopping_x: " << git stopping_x << std::endl; 
 
 
     // Add relevant pixels to list
