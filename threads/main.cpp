@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
     int num_threads = std::stoi(argv[5]);
 
     // Printing run info for logging purposes
-    printf("Running a Threaded program with data size %d x %d and %d threads", height, width, num_threads);
+    printf("Running a Threaded program with data size %d x %d and %d threads.\n", height, width, num_threads);
 
     // Initializing input and output memory space
 	std::vector<uint16_t> altitude_data(height * width);
