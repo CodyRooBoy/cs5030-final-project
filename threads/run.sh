@@ -7,14 +7,13 @@
 #SBATCH --partition=kingspeak
 
 # Set up the run
-$NUM_THREADS = 5
-$DATA_SIZE = 100
-$OUTPUT_NAME = "output_" + $DATA_SIZE + "x" + $DATA_SIZE + "_with_" + $NUM_THREADS + "_threads.raw"  
-$INPUT_NAME = "input_" + $DATA_SIZE + "x" + $DATA_SIZE + ".raw"
+NUM_THREADS=5
+DATA_SIZE=100
+OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_with_${NUM_THREADS}.raw"
+INPUT_NAME="input_${DATA_SIZE}x${DATA_SIZE}.raw"
 
 # Generate input file with resize tool
-../tools/resize 6000x6000.raw 6000 6000 $INPUT_NAME $DATA_SIZE $DATA_SIZE
-mv ../tools/$INPUT_NAME .
+/../tools/resize ../tools/6000x6000.raw 6000 6000 $INPUT_NAME $DATA_SIZE $DATA_SIZE
 
 # set up scratch directory
 SCRDIR=/scratch/general/vast/$USER/$SLURM_JOB_ID
