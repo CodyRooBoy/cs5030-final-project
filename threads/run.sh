@@ -9,7 +9,7 @@
 # Set up the run
 NUM_THREADS=15
 DATA_SIZE=1000
-OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_with_${NUM_THREADS}.raw"
+OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_with_${NUM_THREADS}_threads.raw"
 INPUT_NAME="input_${DATA_SIZE}x${DATA_SIZE}.raw"
 
 # Generate input file with resize tool
