@@ -21,7 +21,7 @@ cd $SCRDIR
 make
 
 # run the program
-./threaded.exe 1000x1000.raw output_1000x1000.raw 1000 1000
+./threaded.exe 1000x1000.raw output_1000x1000.raw 1000 1000 15
 
 cp ./output_1000x1000.raw $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
 
