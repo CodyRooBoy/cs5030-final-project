@@ -15,8 +15,8 @@ int main(int argc, char* argv[]) {
 
     std::string input_name_1 = argv[1];
     std::string input_name_2 = argv[2];
-    int height = std::stoi(argv[2]);
-    int width = std::stoi(argv[3]);
+    int height = std::stoi(argv[3]);
+    int width = std::stoi(argv[4]);
     int input_file_size = height * width;
 
 
