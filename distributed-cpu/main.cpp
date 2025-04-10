@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     MPI_Comm_rank(comm, &rank);
     MPI_Comm_size(comm, &size);
 
-    if (argc < 5) {
+    if (rank == 0 && argc < 5) {
 		std::cerr << "Missing Arguments. Format in the following order: <input_filename> <output_filename> <height> <width>" << std::endl;
         MPI_Finalize();
 		return 1;
