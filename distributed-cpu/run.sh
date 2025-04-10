@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --time=24:00:00
-#SBATCH --nodes=1
+#SBATCH --nodes=4
 #SBATCH -o ./%j/slurmjob-%j.out-%N
 #SBATCH -e ./%j/slurmjob-%j.err-%N
 #SBATCH --account=usucs5030
@@ -26,11 +26,13 @@ cp $INPUT_NAME $SCRDIR
 rm $INPUT_NAME
 cd $SCRDIR
 
+module load gcc/8.5.0 intel-mpi
+
 # compile the program
 make
 
 # run the program
-./serial.exe $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE
+mpirun -np 8 ./distributed_cpu.exe $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE
 
 cp $OUTPUT_NAME $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
 

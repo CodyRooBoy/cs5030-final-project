@@ -1,13 +1,13 @@
-all: serial
+all: distributed_cpu
 
-serial: main.o visibility.o
-	g++ main.o visibility.o -o serial.exe
+distributed_cpu: main.o visibility.o
+	mpicxx main.o visibility.o -o distributed_cpu.exe
 
 main.o: main.cpp visibility.hpp
-	g++ -c main.cpp -o main.o
+	mpicxx -c main.cpp -o main.o
 
 visibility.o: visibility.cpp visibility.hpp
-	g++ -c visibility.cpp -o visibility.o
+	mpicxx -c visibility.cpp -o visibility.o
 
 clean:
-	rm -f *.o serial
+	rm -f *.o *.exe

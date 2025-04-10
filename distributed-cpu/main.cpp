@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 
     // Begining the search for visibility
     auto start_time = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < local_rows; i += 1) {
+    for (int i = start_row; i < start_row + local_rows; i += 1) {
         for (int j = 0; j < width; j += 1) {
             visible_points(altitude_data, local_visibility, height, width, i, j);
         }
