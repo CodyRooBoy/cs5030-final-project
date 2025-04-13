@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
     int block_w_h = std::stoi(argv[5]);
 
     // Printing run info for logging purposes
-    printf("\nRunning a distributed memory GPU program with data size %d x %d.\n", height, width);
+    printf("\nRunning a non-distributed memory GPU program with data size %d x %d.\n", height, width);
 
     // Initializing input and output memory space
 	uint16_t* altitude_data = new uint16_t[height * width];
