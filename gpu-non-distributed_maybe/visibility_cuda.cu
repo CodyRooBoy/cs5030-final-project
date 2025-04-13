@@ -103,8 +103,6 @@ __global__ void get_visibility_gpu(
             continue;
         }
 
-        look_at_size++;
-
         // Get the visibility between the main point and the offset point
         float slope = visibility_line_slope(
             altitude_data[a_data_xy.y * altitude_dim.x_width + a_data_xy.x],
@@ -273,10 +271,13 @@ Point* pixelList_offset() {
     int starting_y = 0;
     int stopping_y = 99;
 
+    int place = 0;
+
     for (int y = starting_y; y <= stopping_y; y++) {
         for (int x = starting_x; x <= stopping_x; x++) {
             if (y == starting_y && x <= 0) continue;
             pixels[place] = { x, y };
+            place++;
         }
     }
 
