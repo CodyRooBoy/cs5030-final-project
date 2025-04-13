@@ -1,15 +1,22 @@
 #include "visibility.hpp"
 
 void visible_points(std::vector<uint16_t> &altitude_data, std::vector<uint32_t> &visibility_data, int height, int width, short x1, short y1) {
-    // short visible_points = 0;
 
-    std::vector<std::pair<int, int>> pixels = pixelList(x1, y1, height, width, 100);
+	// int print_point_x = 1;
+    // int print_point_y = 0;
+	// // Print this points altitude
+	// if (x1 == print_point_x && y1 == print_point_y) {
+	// 	printf("Altitude at (%d,%d) is %d\n", x1, y1, altitude_data[y1 * width + x1]);
+	// }
+
+    std::vector<std::pair<int, int>> pixels = pixelList_new(x1, y1, height, width, 100);
     for (const auto& pixel : pixels) {
+		// if (x1 == print_point_x && y1 == print_point_y) {
+		// 	printf("looking at (%d,%d)\n", pixel.first, pixel.second);
+		// }
         if (visibility_line_exists(altitude_data, x1, y1, pixel.first, pixel.second, width)) {
-            visibility_data[y1 * width + x1]++; ///// Check which one here
+            visibility_data[y1 * width + x1]++;
             visibility_data[pixel.second * width + pixel.first]++;
-
-            // visible_points++;
         }
 		// std::cout << "x: " << pixel.first << ", y: " << pixel.second << " -- " << visibility_data[pixel.second * width + pixel.first] << std::endl;
     }
@@ -179,9 +186,9 @@ std::vector<std::pair<int, int>> pixelList(int x0, int y0, int maxX, int maxY, i
     // If you are on row x0, dont add any points until the y value of the point you are on is greater than the input point y0 value
     // stop going down when x == x0 + radius or x == maxX (whichever is smaller)
 
-    for (int x = starting_x; x < stopping_x; x++) {
-        for (int y = starting_y; y < stopping_y; y++) {
-            if (x == starting_x && y <= y0) continue;
+	for (int x = starting_x; x < stopping_x; x++) {
+		for (int y = starting_y; y < stopping_y; y++) {
+			if (x == starting_x && y <= y0) continue;		
             pixels.emplace_back(x, y);
         }
     }
@@ -189,4 +196,27 @@ std::vector<std::pair<int, int>> pixelList(int x0, int y0, int maxX, int maxY, i
     // This code assumes x values go up and down and y values go across
 
     return pixels;
+}
+
+
+std::vector<std::pair<int, int>> pixelList_new(int x0, int y0, int maxX, int maxY, int radius) {
+
+	// Create a place to store pixel values
+    std::vector<std::pair<int, int>> pixels;
+
+	int starting_y = y0;
+	int stopping_y = std::min(radius + y0, maxY);
+	int starting_x = std::max(x0 - radius, 0);
+	int stopping_x = std::min(x0 + radius + 1, maxX);
+
+
+	for (int y = starting_y; y < stopping_y; y++) {  // Change to <= to increase to 100
+		for (int x = starting_x; x < stopping_x; x++) {
+			if (y == starting_y && x <= x0) continue;
+			pixels.emplace_back(x, y);
+		}
+	}
+
+	return pixels;
+
 }

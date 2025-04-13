@@ -54,14 +54,14 @@ int main(int argc, char* argv[]) {
     std::chrono::duration<double> duration = end_time - start_time;
     std::cout << "Total Time: " << duration.count() << " seconds" << std::endl;
 
-    // // Printing out the visibility_data
-    // for (int x = 0; x < 30; x++) {
-    //     for (int y = 0; y < 30; y++) {
-    //         std::cout << visibility_data.at(y + x * width) << " ";
-    //     }
-    //     std::cout << "\n";
-    // }
-    // std::cout << "\n";
+    // Printing out the visibility_data
+    for (int x = 0; x < 10; x++) {
+        for (int y = 0; y < 10; y++) {
+            std::cout << visibility_data.at(x + y * width) << " ";
+        }
+        std::cout << "\n";
+    }
+    std::cout << "\n";
 
 
     // Writing out visiblity data

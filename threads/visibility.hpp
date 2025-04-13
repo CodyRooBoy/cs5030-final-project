@@ -13,3 +13,4 @@ bool visibility_path(std::vector<uint16_t> &altitude_data, float slope, int x1, 
 float visibility_line_slope(short starting_altitude, short ending_altitude, short x1, short y1, short x2, short y2);
 void worker_thread(std::vector<uint16_t> &altitude_data, std::vector<uint32_t> &visibility_data, int height, int width, std::mutex &mutex, std::vector<std::pair<int, int>> pixels);
 std::vector<std::pair<int, int>> pixelList(int x0, int y0, int maxX, int maxY, int radius);
+std::vector<std::pair<int, int>> pixelList_new(int x0, int y0, int maxX, int maxY, int radius);

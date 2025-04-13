@@ -72,8 +72,8 @@ int main(int argc, char* argv[]) {
     std::cout << "Total Time: " << duration.count() << " seconds" << std::endl;
 
     // // Printing out the visibility_data
-    // for (int x = 0; x < 30; x++) {
-    //     for (int y = 0; y < 30; y++) {
+    // for (int x = 0; x < 10; x++) {
+    //     for (int y = 0; y < 10; y++) {
     //         std::cout << visibility_data.at(y + x * width) << " ";
     //     }
     //     std::cout << "\n";

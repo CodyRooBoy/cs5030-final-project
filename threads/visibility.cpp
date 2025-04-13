@@ -1,11 +1,12 @@
 #include "visibility.hpp"
 
 void visible_points(std::vector<uint16_t> &altitude_data, std::vector<uint32_t> &visibility_data, int height, int width, short x1, short y1,  std::mutex &mutex) {
+	
+	std::vector<std::pair<int, int>> pixels = pixelList_new(x1, y1, height, width, 100);
 
-	std::vector<std::pair<int, int>> pixels = pixelList(x1, y1, height, width, 100);
     for (const auto& pixel : pixels) {
         if (visibility_line_exists(altitude_data, x1, y1, pixel.first, pixel.second, width)) {
-            visibility_data[y1 * width + x1]++; ///// Check which one here
+            visibility_data[y1 * width + x1]++;
             visibility_data[pixel.second * width + pixel.first]++;
 
         }
@@ -184,4 +185,27 @@ std::vector<std::pair<int, int>> pixelList(int x0, int y0, int maxX, int maxY, i
     // This code assumes x values go up and down and y values go across
 
     return pixels;
+}
+
+
+std::vector<std::pair<int, int>> pixelList_new(int x0, int y0, int maxX, int maxY, int radius) {
+
+	// Create a place to store pixel values
+    std::vector<std::pair<int, int>> pixels;
+
+	int starting_y = y0;
+	int stopping_y = std::min(radius + y0, maxY);
+	int starting_x = std::max(x0 - radius, 0);
+	int stopping_x = std::min(x0 + radius + 1, maxX);
+
+
+	for (int y = starting_y; y < stopping_y; y++) {  // Change to <= to increase to 100
+		for (int x = starting_x; x < stopping_x; x++) {
+			if (y == starting_y && x <= x0) continue;
+			pixels.emplace_back(x, y);
+		}
+	}
+
+	return pixels;
+
 }

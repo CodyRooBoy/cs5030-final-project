@@ -1,17 +1,18 @@
+#include "visibility_cuda.hpp"
+
+__global__ void get_visibility_gpu(uint16_t* altitude_data, dimensions altitude_dim, int left_offset, dimensions from_points_dim, Point* offsets, int* visibility_results_d, int* from_point_visibility_d);
+__device__ bool visibility_path(uint16_t* altitude_data, float slope, int x1, int y1, int x2, int y2, int a_data_width);
+__device__ float visibility_line_slope(short starting_altitude, short ending_altitude, short x1, short y1, short x2, short y2);
 
 
-// left_offset is the number of pixels from the first from_pixel to the edge of the altitude data on the left
-
-
-uint16_t* run_visibility_search(
+int* run_visibility_search(
         uint16_t* altitude_data, 
-        int altitude_data_size,
-        int left_offset,
         dimensions altitude_dim,
+        int left_offset,
         dimensions from_point_dim,
         Point* offsets,
         dimensions block_dim,
-        uint16_t* visibility_results) {
+        int* visibility_results) {
 
     // Needs alitidue data and data dimentions
     // Needs from point dimentions
@@ -20,100 +21,143 @@ uint16_t* run_visibility_search(
 
     // Allocate memory for Altitude data
     uint16_t* altitude_data_d;
+    int altitude_data_size = altitude_dim.x_width * altitude_dim.y_height;
     cudaMalloc((void **) &altitude_data_d, altitude_data_size * sizeof(uint16_t));
     cudaMemcpy(altitude_data_d, altitude_data, altitude_data_size * sizeof(uint16_t), cudaMemcpyHostToDevice);
 
-    // Allocate memory for visibility results for each to point in altitude data (will be same size)
-    uint16_t* visibility_results_d;
-    cudaMalloc((void **) &visibility_results_d, altitude_data_size * sizeof(uint16_t));
+    // Allocate memory for visibility results for each to-point in altitude data (will be same size)
+    int* visibility_results_d;
+    cudaMalloc((void **) &visibility_results_d, altitude_data_size * sizeof(int));
 
     // Allocate memory for from point data (will be same size as from point dimensions)
-    uint16_t* from_point_visibility_d;
-    cudaMalloc((void **) &from_point_visibility_d, from_point_dim.x_width * from_point_dim.y_height * sizeof(uint16_t));
+    int* from_point_visibility_d;
+    cudaMalloc((void **) &from_point_visibility_d, from_point_dim.x_width * from_point_dim.y_height * sizeof(int));
 
     // Allocate memory for offset values
     Point* offsets_d;
-    cudaMalloc((void **) &offsets_d, from_point_dim.x_width * from_point_dim.y_height * sizeof(Point));
+    cudaMalloc((void **) &offsets_d, 19999 * sizeof(Point));
+    cudaMemcpy(offsets_d, offsets, 19999 * sizeof(Point), cudaMemcpyHostToDevice);
 
-    
 
-    // Build out block and grid dimensions
     dim3 input_block_dim(block_dim.x_width, block_dim.y_height);
-    dim3 grid_dim((int)ceil((float)altitude_dim.x_width / block_dim.x_width), (int)ceil((float)altitude_dim.y_height / block_dim.y_height));
-    
+    dim3 grid_dim((int)ceil((float)from_point_dim.x_width / block_dim.x_width), (int)ceil((float)from_point_dim.y_height / block_dim.y_height));
+
+    printf("Grid dim: %d, %d\n", grid_dim.x, grid_dim.y);
+    printf("Block dim: %d, %d\n", input_block_dim.x, input_block_dim.y);
+    fflush(stdout);
+
     get_visibility_gpu<<<grid_dim, input_block_dim>>>(
         altitude_data_d,
-        altitude_data_size,
-        left_offset,
         altitude_dim,
+        left_offset,
         from_point_dim,
         offsets_d,
         visibility_results_d,
         from_point_visibility_d
     );
 
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        printf("CUDA error: %s\n", cudaGetErrorString(err));
+    }
+    cudaDeviceSynchronize();
 
+    // Copy the visibility results back to the host
+    cudaMemcpy(visibility_results, visibility_results_d, altitude_data_size * sizeof(int), cudaMemcpyDeviceToHost);
+
+    // Copy the from point visibility results back to the host
+    int* from_point_visibility = (int*)malloc(from_point_dim.x_width * from_point_dim.y_height * sizeof(int));
+    cudaMemcpy(from_point_visibility, from_point_visibility_d, from_point_dim.x_width * from_point_dim.y_height * sizeof(int), cudaMemcpyDeviceToHost);
+    
+    // Combine the data
+    for (int x = 0; x < from_point_dim.x_width; x++) {
+        for (int y = 0; y < from_point_dim.y_height; y++) {
+            visibility_results[y * altitude_dim.x_width + x + left_offset] += from_point_visibility[y * from_point_dim.x_width + x];
+        }
+    }
+
+
+
+    return 0;
     
 }
 
-__global__ get_visibility_gpu(
+__global__ void get_visibility_gpu(
         uint16_t* altitude_data,
-        int altitude_data_size,
-        int left_offset,
         dimensions altitude_dim,
+        int left_offset,
         dimensions from_points_dim,
         Point* offsets,
-        uint16_t* visibility_results_d,
-        uint16_t* from_point_visibility_d) {
+        int* visibility_results_d,
+        int* from_point_visibility_d) {
 
 
-    // Iterate through all the offsets
+    Point from_section_xy = {(int)(blockIdx.x * blockDim.x + threadIdx.x), (int)(blockIdx.y * blockDim.y + threadIdx.y)};
+    Point a_data_xy = {(int)(blockIdx.x * blockDim.x + threadIdx.x + left_offset), (int)(blockIdx.y * blockDim.y + threadIdx.y)};
 
-    // determine if the offset is within the bounds of the altitude data
+    int print_point_x = 10;
+    int print_point_y = 10;
+    int look_at_size = 0;
 
-    // If it is, check if the point is visible from the from point
-        // If it is, increment the visibility result for this point in the from point visibility data as well as in the to point data
-    // If it is not, do nothing
-
-    Point from_section_xy = {blockIdx.x * blockDim.x + threadIdx.x, blockIdx.y * blockDim.y + threadIdx.y}
-    Point a_data_xy = {from_section_x + left_offset, blockIdx.y * blockDim.y + threadIdx.y};
 
     // Check if the thread is within the bounds of the from_point dimensions, exits if it is
-    if (from_section_xy.x_width > from_points_dim.x_width || from_section_xy.y_height > from_points_dim.y_height) {
+    if (from_section_xy.x >= from_points_dim.x_width || from_section_xy.y >= from_points_dim.y_height) {
         return;
     }
 
-    for (int i = 0; i < 20200; i++) {
+    for (int i = 0; i < 19999; i++) {
         
         Point current_offset = offsets[i];
+
         // Get the xy coordinates of the offset within the altitude data
-        Point a_data_to_xy = {a_data_xy.x_width + current_offset.x_width, a_data_xy.y_height + current_offset.y_height};
+        Point a_data_to_xy = {a_data_xy.x + current_offset.x, a_data_xy.y + current_offset.y};
+
         // Check if the offset is within the bounds of the altitude data
-        if (a_data_to_xy.x_width < 0 || a_data_to_xy.x_width >= altitude_dim.x_width || a_data_to_xy.y_height < 0 || a_data_to_xy.y_height >= altitude_dim.y_height) {
+        if (a_data_to_xy.x < 0 || a_data_to_xy.x >= altitude_dim.x_width || a_data_to_xy.y < 0 || a_data_to_xy.y >= altitude_dim.y_height) {
             continue;
         }
 
+        look_at_size++;
+
         // Get the visibility between the main point and the offset point
         float slope = visibility_line_slope(
-            altitude_data[a_data_xy.y_height * altitude_dim.x_width + a_data_xy.x_width],
-            altitude_data[a_data_to_xy.y_height * altitude_dim.x_width + a_data_to_xy.x_width],
-            a_data_xy.x_width,
-            a_data_xy.y_height,
-            a_data_to_xy.x_width,
-            a_data_to_xy.y_height
+            altitude_data[a_data_xy.y * altitude_dim.x_width + a_data_xy.x],
+            altitude_data[a_data_to_xy.y * altitude_dim.x_width + a_data_to_xy.x],
+            a_data_xy.x,
+            a_data_xy.y,
+            a_data_to_xy.x,
+            a_data_to_xy.y
         );
-        bool visibile = visibility_path(altitude_data, slope, a_data_xy.x_width, a_data_xy.y_height, a_data_to_xy.x_width, a_data_to_xy.y_height, altitude_dim.x_width);
+
+        bool visible = visibility_path(altitude_data, slope, a_data_xy.x, a_data_xy.y, a_data_to_xy.x, a_data_to_xy.y, altitude_dim.x_width);
+        
+        // TEMP
+        // if (a_data_xy.x == print_point_x && a_data_xy.y == print_point_y) {
+        //     zero_zero_visibility_d[*zero_zero_visibility_size] = {a_data_to_xy.x, a_data_to_xy.y};
+        //     *zero_zero_visibility_size++;
+        // }
+
+        // if (a_data_xy.x == print_point_x && a_data_xy.y == print_point_y) {
+        //     if (visible) {
+        //         printf("(%d,%d) - VISIBLE\n", a_data_to_xy.x, a_data_to_xy.y);
+        //     } else {
+        //         printf("(%d,%d) - NOT VISIBLE\n", a_data_to_xy.x, a_data_to_xy.y);
+        //     }
+        // }
 
         // If the point is visible, increment the visibility result for this point in the from point visibility data as well as in the to point data
-        if (visibile) {
+        if (visible) {
             // Increment the visibility result for this point in the from point visibility data
-            from_point_visibility_d[from_section_xy.y_height * from_points_dim.x_width + from_section_xy.x_width] += 1;
+            atomicAdd(&from_point_visibility_d[from_section_xy.y * from_points_dim.x_width + from_section_xy.x], 1);
+            // from_point_visibility_d[from_section_xy.y * from_points_dim.x_width + from_section_xy.x] += 1;
             // Increment the visibility result for this point in the to point data
-            visibility_results_d[a_data_to_xy.y_height * altitude_dim.x_width + a_data_to_xy.x_width] += 1;
+            atomicAdd(&visibility_results_d[a_data_to_xy.y * altitude_dim.x_width + a_data_to_xy.x], 1);
+            // visibility_results_d[a_data_to_xy.y * altitude_dim.x_width + a_data_to_xy.x] += 1;
         }
     }
-
-
+    if (a_data_xy.x == print_point_x && a_data_xy.y == print_point_y) {
+        printf("%d,%d has looked at size of %d\n", print_point_x, print_point_y, look_at_size);
+    }
 }
 
 __device__ bool visibility_path(uint16_t* altitude_data, float slope, int x1, int y1, int x2, int y2, int a_data_width)
@@ -156,7 +200,7 @@ __device__ bool visibility_path(uint16_t* altitude_data, float slope, int x1, in
 		{
             Point point = {x, y};
             if (x != x1 && y != y1 && x != x2 && y != y2) {
-                if ((altitude_data[point.y_height * a_data_width + point.x_width]) < (altitude + slope)) {
+                if ((altitude_data[point.y * a_data_width + point.x]) < (altitude + slope)) {
                     altitude = altitude + slope;
                 }
                 else {
@@ -209,7 +253,7 @@ __device__ bool visibility_path(uint16_t* altitude_data, float slope, int x1, in
 		{
             Point point = {x, y};
             if (x != x1 && y != y1 && x != x2 && y != y2) {
-                if ((altitude_data[point.y_height * a_data_width + point.x_width]) < (altitude + slope)) {
+                if ((altitude_data[point.y * a_data_width + point.x]) < (altitude + slope)) {
                     altitude = altitude + slope;
                 }
                 else {
@@ -252,13 +296,13 @@ __device__ float visibility_line_slope(short starting_altitude, short ending_alt
 Point* pixelList_offset() {
 
     // Create a place to store pixel values
-    Point* pixels = (Point*)malloc(sizeof(Point) * 20200);
+    Point* pixels = (Point*)malloc(sizeof(Point) * 19999);
 
     // Set the bounds of the relevant pixel box
     int starting_x = -100;
     int stopping_x = 100;
     int starting_y = 0;
-    int stopping_y = 100;
+    int stopping_y = 99;
 
     int place = 0;
 
@@ -270,7 +314,7 @@ Point* pixelList_offset() {
         }
     }
 
-    // This code assumes x values go across and y values up and down
+    printf("Num offsets: %d\n", place);
 
     return pixels;
 }

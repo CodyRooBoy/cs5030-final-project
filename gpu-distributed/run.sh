@@ -1,15 +1,16 @@
 #!/bin/bash
 #SBATCH --time=24:00:00
 #SBATCH --nodes=1
+#SBATCH --gres=gpu:1
 #SBATCH -o ./%j/slurmjob-%j.out-%N
 #SBATCH -e ./%j/slurmjob-%j.err-%N
-#SBATCH --account=usucs5030
-#SBATCH --partition=kingspeak
+#SBATCH --account=kingspeak-gpu
+#SBATCH --partition=kingspeak-gpu
 
 # Set up the run
-NUM_THREADS=15
 DATA_SIZE=1000
-OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_with_${NUM_THREADS}_threads.raw"
+BLOCK_SIZE=32
+OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_GPU_block_size_${BLOCK_SIZE}.raw"
 INPUT_NAME="input_${DATA_SIZE}x${DATA_SIZE}.raw"
 
 # Generate input file with resize tool
@@ -20,18 +21,21 @@ SCRDIR=/scratch/general/vast/$USER/$SLURM_JOB_ID
 mkdir -p $SCRDIR
 
 cp main.cpp $SCRDIR
-cp visibility.cpp $SCRDIR
-cp visibility.hpp $SCRDIR
+cp visibility_cuda.cu $SCRDIR
+cp visibility_cuda.hpp $SCRDIR
 cp Makefile $SCRDIR
 cp $INPUT_NAME $SCRDIR
 rm $INPUT_NAME
 cd $SCRDIR
 
+# load your module
+module load cuda/12.5.0
+
 # compile the program
 make
 
 # run the program
-./threaded.exe $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE $NUM_THREADS
+./distributed_gpu $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE $BLOCK_SIZE
 
 cp $OUTPUT_NAME $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
 
