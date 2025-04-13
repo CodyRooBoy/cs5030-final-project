@@ -12,7 +12,7 @@ if [ ! -f "6000x6000.raw" ]; then
 fi
 
 g++ resize_dataset.cpp -o resize
-g++ validate_dataset.cpp -o validate
+g++ validate_datasets.cpp -o validate
 
 cd ../
 
@@ -33,7 +33,7 @@ cd ../
 
 # -------------------- Run Threaded implementation (Shared Memory Parallel)
 
-cd ./threaded
+cd ./threads
 # Parameter List <Data Size> <Number of Threads>
 sbatch run.sh 500 4
 sbatch run.sh 500 8
@@ -66,7 +66,7 @@ cd ../
 
 # -------------------------------- Run GPU implementation (Non-Distributed)
 
-cd ./gpu-non-distributed
+cd ./gpu-non-distributed_maybe
 # Parameter List <Data Size> <Block Size>
 sbatch run.sh 500 5
 sbatch run.sh 500 15
