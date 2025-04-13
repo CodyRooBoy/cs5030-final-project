@@ -6,8 +6,10 @@
 #SBATCH --account=usucs5030
 #SBATCH --partition=kingspeak
 
+# Parameter List <Data Size>
+
 # Set up the run
-DATA_SIZE=1000
+DATA_SIZE=$1
 OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_serial.raw"
 INPUT_NAME="input_${DATA_SIZE}x${DATA_SIZE}.raw"
 

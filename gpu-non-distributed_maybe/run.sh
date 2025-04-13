@@ -7,9 +7,11 @@
 #SBATCH --account=kingspeak-gpu
 #SBATCH --partition=kingspeak-gpu
 
+# Parameter List <Data Size> <Block Size>
+
 # Set up the run
-DATA_SIZE=1000
-BLOCK_SIZE=32
+DATA_SIZE=$1
+BLOCK_SIZE=$2
 OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_non-dist_GPU_block_size_${BLOCK_SIZE}.raw"
 INPUT_NAME="input_${DATA_SIZE}x${DATA_SIZE}.raw"
 
