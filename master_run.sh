@@ -1,6 +1,23 @@
 #!/bin/bash
 
 
+# --------------------------------------- Build resize and validation tools
+
+cd ./tools
+
+# check if 6000x6000.raw exists
+if [ ! -f "6000x6000.raw" ]; then
+    echo "6000x6000.raw not found in tools directory... EXITING"
+    exit 1
+fi
+
+g++ resize_dataset.cpp -o resize
+g++ validate_dataset.cpp -o validate
+
+cd ../
+
+
+
 # ----------------------------------------------- Run Serial implementation
 
 cd ./serial
@@ -75,3 +92,9 @@ cd ./gpu-distributed
 # Insert calls here
 
 cd ../
+
+
+
+# ------------------------------------- (future?) Validate all output files
+
+# Validation happens here
