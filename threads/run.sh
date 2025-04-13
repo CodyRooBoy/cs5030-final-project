@@ -12,7 +12,7 @@
 DATA_SIZE=$1
 NUM_THREADS=$2
 OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_with_${NUM_THREADS}_threads.raw"
-INPUT_NAME="input_${DATA_SIZE}x${DATA_SIZE}.raw"
+INPUT_NAME="input_${DATA_SIZE}x${DATA_SIZE}_for_nt_${NUM_THREADS}.raw"
 
 # Generate input file with resize tool
 ../tools/resize ../tools/6000x6000.raw 6000 6000 $INPUT_NAME $DATA_SIZE $DATA_SIZE
