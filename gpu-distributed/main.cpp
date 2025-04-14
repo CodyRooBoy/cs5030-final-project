@@ -66,6 +66,8 @@ int main(int argc, char* argv[]) {
 
         // Printing run info for logging purposes
         printf("\nRunning a distributed memory GPU program with data size %d x %d and %d.\n", input_height, input_width, num_processes);
+
+        // Broadcast the input info
     }
 
     // Figure out how to split the data up
