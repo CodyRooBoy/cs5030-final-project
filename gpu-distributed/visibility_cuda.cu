@@ -12,7 +12,8 @@ int* run_visibility_search(
         dimensions from_point_dim,
         Point* offsets,
         dimensions block_dim,
-        int* visibility_results) {
+        int* visibility_results,
+        int rank) {
 
 
     // Allocate memory for Altitude data
@@ -39,6 +40,12 @@ int* run_visibility_search(
     dim3 grid_dim((int)ceil((float)from_point_dim.x_width / block_dim.x_width), (int)ceil((float)from_point_dim.y_height / block_dim.y_height));
 
     fflush(stdout);
+
+    // Figure out which CUDA device to use based on the rank
+    int device_count;
+    cudaGetDeviceCount(&device_count);
+    // printf("Device Count: %d\n", device_count);
+    cudaSetDevice(rank % device_count);
 
     get_visibility_gpu<<<grid_dim, input_block_dim>>>(
         altitude_data_d,

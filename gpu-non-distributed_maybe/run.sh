@@ -37,7 +37,7 @@ module load cuda/12.5.0
 make
 
 # run the program
-./distributed_gpu $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE $BLOCK_SIZE
+./non_distributed_gpu $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE $BLOCK_SIZE
 
 cp $OUTPUT_NAME $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
 
