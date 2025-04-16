@@ -1,6 +1,6 @@
 #include "visibility_cuda.hpp"
 
-__global__ void get_visibility_gpu(uint16_t* altitude_data, dimensions altitude_dim, int left_offset, dimensions from_points_dim, Point* offsets, int* visibility_results_d, int* from_point_visibility_d);
+__global__ void get_visibility_gpu(uint16_t* altitude_data, dimensions altitude_dim, int left_offset, dimensions from_points_dim, Point* offsets, int* visibility_results_d, int* from_point_visibility_d, int rank);
 __device__ bool visibility_path(uint16_t* altitude_data, float slope, int x1, int y1, int x2, int y2, int a_data_width);
 __device__ float visibility_line_slope(short starting_altitude, short ending_altitude, short x1, short y1, short x2, short y2);
 
@@ -15,6 +15,20 @@ int* run_visibility_search(
         int* visibility_results,
         int rank) {
 
+    
+    // if (rank == 2) {
+    //     printf("\nPrinting out Rank 2 altitude running visibility algorithm in cuda:\n");
+    //     for (int y = 0; y < altitude_dim.y_height; y++) {
+    //         for (int x = 0; x < altitude_dim.x_width; x++) {
+    //             printf("%d ", altitude_data[x + (y * altitude_dim.x_width)]);
+    //         }
+    //         printf("\n");
+    //     }
+    //     printf("Printing out other Rank 2 information:\n");
+    //     printf("Left offset: %d\n", left_offset);
+    //     printf("From point dimensions: %d, %d\n", from_point_dim.x_width, from_point_dim.y_height);
+    //     printf("Block dimensions: %d, %d\n", block_dim.x_width, block_dim.y_height);
+    // }
 
     // Allocate memory for Altitude data
     uint16_t* altitude_data_d;
@@ -25,10 +39,12 @@ int* run_visibility_search(
     // Allocate memory for visibility results for each to-point in altitude data (will be same size)
     int* visibility_results_d;
     cudaMalloc((void **) &visibility_results_d, altitude_data_size * sizeof(int));
+    cudaMemset(visibility_results_d, 0, altitude_data_size * sizeof(int));
 
     // Allocate memory for from point data (will be same size as from point dimensions)
     int* from_point_visibility_d;
     cudaMalloc((void **) &from_point_visibility_d, from_point_dim.x_width * from_point_dim.y_height * sizeof(int));
+    cudaMemset(from_point_visibility_d, 0, from_point_dim.x_width * from_point_dim.y_height * sizeof(int));
 
     // Allocate memory for offset values
     Point* offsets_d;
@@ -44,8 +60,9 @@ int* run_visibility_search(
     // Figure out which CUDA device to use based on the rank
     int device_count;
     cudaGetDeviceCount(&device_count);
-    // printf("Device Count: %d\n", device_count);
-    cudaSetDevice(rank % device_count);
+    // cudaSetDevice(rank % device_count);
+    cudaSetDevice(0);
+    printf("Rank %d going to device %d\n", rank, (rank % device_count));
 
     get_visibility_gpu<<<grid_dim, input_block_dim>>>(
         altitude_data_d,
@@ -54,7 +71,8 @@ int* run_visibility_search(
         from_point_dim,
         offsets_d,
         visibility_results_d,
-        from_point_visibility_d
+        from_point_visibility_d,
+        rank
     );
 
     cudaError_t err = cudaGetLastError();
@@ -62,6 +80,7 @@ int* run_visibility_search(
         printf("CUDA error: %s\n", cudaGetErrorString(err));
     }
     cudaDeviceSynchronize();
+    fflush(stdout);
 
     // Copy the visibility results back to the host
     cudaMemcpy(visibility_results, visibility_results_d, altitude_data_size * sizeof(int), cudaMemcpyDeviceToHost);
@@ -69,6 +88,16 @@ int* run_visibility_search(
     // Copy the from point visibility results back to the host
     int* from_point_visibility = (int*)malloc(from_point_dim.x_width * from_point_dim.y_height * sizeof(int));
     cudaMemcpy(from_point_visibility, from_point_visibility_d, from_point_dim.x_width * from_point_dim.y_height * sizeof(int), cudaMemcpyDeviceToHost);
+
+    // if (rank == 2) {
+    //     printf("\nPrinting out Rank 2 from_point data before combining:\n");
+    //     for (int y = 0; y < altitude_dim.y_height; y++) {
+    //         for (int x = 0; x < altitude_dim.x_width; x++) {
+    //             printf("%d ", from_point_visibility[x + (y * from_point_dim.x_width)]);
+    //         }
+    //         printf("\n");
+    //     }
+    // }
     
     // Combine the from_point data and to_point data
     for (int x = 0; x < from_point_dim.x_width; x++) {
@@ -76,6 +105,16 @@ int* run_visibility_search(
             visibility_results[y * altitude_dim.x_width + x + left_offset] += from_point_visibility[y * from_point_dim.x_width + x];
         }
     }
+
+    // if (rank == 2) {
+    //     printf("\nPrinting out Rank 2 visibilty data after combining:\n");
+    //     for (int y = 0; y < altitude_dim.y_height; y++) {
+    //         for (int x = 0; x < altitude_dim.x_width; x++) {
+    //             printf("%d ", visibility_results[x + (y * altitude_dim.x_width)]);
+    //         }
+    //         printf("\n");
+    //     }
+    // }
 
     return 0;
 }
@@ -87,7 +126,8 @@ __global__ void get_visibility_gpu(
         dimensions from_points_dim,
         Point* offsets,
         int* visibility_results_d,
-        int* from_point_visibility_d) {
+        int* from_point_visibility_d,
+        int rank) {
 
     // Get XY position relative to the altitude data as well as the from_point section
     Point from_section_xy = {(int)(blockIdx.x * blockDim.x + threadIdx.x), (int)(blockIdx.y * blockDim.y + threadIdx.y)};
@@ -124,7 +164,6 @@ __global__ void get_visibility_gpu(
 
         // If the point is visible, increment the visibility result for this point in the from point visibility data as well as in the to point data
         if (visible) {
-
             // Increment the visibility result for this point in the from point visibility data
             atomicAdd(&from_point_visibility_d[from_section_xy.y * from_points_dim.x_width + from_section_xy.x], 1);
 
@@ -132,6 +171,7 @@ __global__ void get_visibility_gpu(
             atomicAdd(&visibility_results_d[a_data_to_xy.y * altitude_dim.x_width + a_data_to_xy.x], 1);
         }
     }
+    
 }
 
 __device__ bool visibility_path(uint16_t* altitude_data, float slope, int x1, int y1, int x2, int y2, int a_data_width)
