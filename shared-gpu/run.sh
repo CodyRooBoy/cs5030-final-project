@@ -12,7 +12,7 @@
 # Set up the run
 DATA_SIZE=$1
 BLOCK_SIZE=$2
-OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_GPU_block_size_${BLOCK_SIZE}.raw"
+OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_non-dist_GPU_block_size_${BLOCK_SIZE}.raw"
 INPUT_NAME="input_${DATA_SIZE}x${DATA_SIZE}_for_bs_${BLOCK_SIZE}.raw"
 
 # Generate input file with resize tool
@@ -37,7 +37,7 @@ module load cuda/12.5.0
 make
 
 # run the program
-./distributed_gpu $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE $BLOCK_SIZE
+./non_distributed_gpu $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE $BLOCK_SIZE
 
 cp $OUTPUT_NAME $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
 

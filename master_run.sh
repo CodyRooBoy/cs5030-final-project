@@ -33,7 +33,7 @@ cd ../
 
 # -------------------- Run Threaded implementation (Shared Memory Parallel)
 
-cd ./threads
+cd ./shared-cpu
 # Parameter List <Data Size> <Number of Threads>
 sbatch threads_run.sh 500 4
 sbatch threads_run.sh 500 8
@@ -73,7 +73,7 @@ cd ../
 
 # -------------------------------- Run GPU implementation (Non-Distributed)
 
-cd ./gpu-non-distributed_maybe
+cd ./shared-gpu
 # Parameter List <Data Size> <Block Size>
 sbatch run.sh 500 5
 sbatch run.sh 500 15
@@ -93,7 +93,7 @@ cd ../
 
 # ------------------------------------ Run GPU implementation (Distributed)
 
-cd ./gpu-distributed
+cd ./distributed-gpu
 # Parameter List <Data Size> <Block Size>
 
 # Insert calls here

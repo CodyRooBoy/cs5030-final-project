@@ -3,7 +3,7 @@ NVCC = nvcc
 CXXFLAGS = -std=c++17
 NVCCFLAGS = -std=c++17
 
-TARGET = distributed_gpu
+TARGET = non_distributed_gpu
 OBJS = main.o visibility_cuda.o
 
 all: $(TARGET)
