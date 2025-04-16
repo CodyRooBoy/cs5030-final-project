@@ -23,9 +23,9 @@ cd ../
 cd ./serial
 
 # Parameter List <Data Size>
-sbatch run.sh 500
-sbatch run.sh 1000
-sbatch run.sh 2000
+sbatch serial_run.sh 500
+sbatch serial_run.sh 1000
+sbatch serial_run.sh 2000
 
 cd ../
 
@@ -35,17 +35,17 @@ cd ../
 
 cd ./threads
 # Parameter List <Data Size> <Number of Threads>
-sbatch run.sh 500 4
-sbatch run.sh 500 8
-sbatch run.sh 500 16
+sbatch threads_run.sh 500 4
+sbatch threads_run.sh 500 8
+sbatch threads_run.sh 500 16
 
-sbatch run.sh 1000 4
-sbatch run.sh 1000 8
-sbatch run.sh 1000 16
+sbatch threads_run.sh 1000 4
+sbatch threads_run.sh 1000 8
+sbatch threads_run.sh 1000 16
 
-sbatch run.sh 2000 4
-sbatch run.sh 2000 8
-sbatch run.sh 2000 16
+sbatch threads_run.sh 2000 4
+sbatch threads_run.sh 2000 8
+sbatch threads_run.sh 2000 16
 
 cd ../
 
@@ -57,17 +57,17 @@ cd ../
 
 cd ./distributed-cpu
 # Parameter List <Data Size> <Number of Processes>
-sbatch run.sh 500 4
-sbatch run.sh 500 8
-sbatch run.sh 500 16
+sbatch distributed_cpu_run.sh 500 4
+sbatch distributed_cpu_run.sh 500 8
+sbatch distributed_cpu_run.sh 500 16
 
-sbatch run.sh 1000 4
-sbatch run.sh 1000 8
-sbatch run.sh 1000 16
+sbatch distributed_cpu_run.sh 1000 4
+sbatch distributed_cpu_run.sh 1000 8
+sbatch distributed_cpu_run.sh 1000 16
 
-sbatch run.sh 2000 4
-sbatch run.sh 2000 8
-sbatch run.sh 2000 16
+sbatch distributed_cpu_run.sh 2000 4
+sbatch distributed_cpu_run.sh 2000 8
+sbatch distributed_cpu_run.sh 2000 16
 
 cd ../
 
