@@ -24,8 +24,8 @@ The serial CPU implementation is in the [`serial`](/serial/) subdirectory. To co
 
 ```bash
 cd serial/
-# ./serial_run.sh <Data Size>
-./serial_run.sh 1000
+# sbatch serial_run.sh <Data Size>
+sbatch serial_run.sh 1000
 ```
 
 The script will schedule a job on the Kingspeak CHPC cluster. The output file will be created in a subdirectory that is named the SLURM Job ID.
@@ -46,8 +46,8 @@ The parallel shared memory CPU implementation is in the [`threads`](/threads/) s
 
 ```bash
 cd threads/
-# ./threads_run.sh <Data Size> <Number of Threads>
-./threads_run.sh 1000 8
+# sbatch threads_run.sh <Data Size> <Number of Threads>
+sbatch threads_run.sh 1000 8
 ```
 
 The script will schedule a job on the Kingspeak CHPC cluster. The output file will be created in a subdirectory that is named the SLURM Job ID.
@@ -60,10 +60,32 @@ cd threads/
 make
 
 # Command Line Format: ./threaded $INPUT_FILE_NAME $OUTPUT_FILE_NAME $WIDTH $HEIGHT $NUM_THREADS
-./threaded 1000x1000.raw output_1000x1000_serial.raw 1000 1000 8
+./threaded 1000x1000.raw output_1000x1000_threaded.raw 1000 1000 8
 ```
 
 ### Parallel CUDA GPU Implementation
+The parallel CUDA GPU implementation is in the [`shared-gpu`](/shared-gpu/) subdirectory. To compile and run the code on the CHPC, run the `shared_gpu_run.sh` Bash script along with the argument for the width and height of the output file and the block size for the GPU to use.
+
+```bash
+cd shared-gpu/
+# sbatch shared_gpu_run.sh <Data Size> <Block Size>
+sbatch shared_gpu_run.sh 2000 5
+```
+
+The script will schedule a job on the CHPC. The output file will be created in a subdirectory that is named the SLURM Job ID.
+
+To manually run the serial implementation, use the following commands:
+
+```bash
+cd shared-gpu/
+
+module load cuda/12.5.0
+
+make
+
+# Command Line Format: ./non_distributed_gpu $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE $BLOCK_SIZE
+./non_distributed_gpu 1000x1000.raw output_1000x1000_non-dist_GPU_block_size_32.raw 1000 1000 32
+```
 
 ### Parallel Distributed Memory CPU Implementation
 The parallel distributed memory CPU implementation is in the [`distributed-cpu`](/distributed-cpu/) subdirectory. To compile and run the code on the Kingspeak CHPC cluster, run the `distributed_cpu_run.sh` Bash script along with the argument for the width and height of the output file.
@@ -71,7 +93,7 @@ The parallel distributed memory CPU implementation is in the [`distributed-cpu`]
 ```bash
 cd distributed-cpu/
 # ./distributed_cpu_run.sh <Data Size> <Number of Processes>
-./distributed_cpu_run.sh 1000 8
+sbatch distributed_cpu_run.sh 1000 8
 ```
 
 The script will schedule a job on the Kingspeak CHPC cluster. The output file will be created in a subdirectory that is named the SLURM Job ID.
@@ -86,7 +108,7 @@ module load gcc/8.5.0 intel-mpi
 make
 
 # Command Line Format: mpirun -np $NUM_PROCESSES ./distributed_cpu.exe $INPUT_FILE_NAME $OUTPUT_FILE_NAME $WIDTH $HEIGHT
-mpirun -np 8 ./distributed_cpu.exe 1000x1000.raw output_1000x1000_serial.raw 1000 1000
+mpirun -np 8 ./distributed_cpu.exe 1000x1000.raw output_1000x1000_mpi.raw 1000 1000
 ```
 
 ### Distributed Memory GPU Implementation

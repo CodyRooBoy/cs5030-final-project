@@ -75,17 +75,17 @@ cd ../
 
 cd ./shared-gpu
 # Parameter List <Data Size> <Block Size>
-sbatch run.sh 500 5
-sbatch run.sh 500 15
-sbatch run.sh 500 32
+sbatch shared_gpu_run.sh 500 5
+sbatch shared_gpu_run.sh 500 15
+sbatch shared_gpu_run.sh 500 32
 
-sbatch run.sh 2000 5
-sbatch run.sh 2000 15
-sbatch run.sh 2000 32
+sbatch shared_gpu_run.sh 2000 5
+sbatch shared_gpu_run.sh 2000 15
+sbatch shared_gpu_run.sh 2000 32
 
-sbatch run.sh 6000 5
-sbatch run.sh 6000 15
-sbatch run.sh 6000 32
+sbatch shared_gpu_run.sh 6000 5
+sbatch shared_gpu_run.sh 6000 15
+sbatch shared_gpu_run.sh 6000 32
 
 cd ../
 
