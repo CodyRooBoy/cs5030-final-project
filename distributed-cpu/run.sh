@@ -33,7 +33,7 @@ module load gcc/8.5.0 intel-mpi
 make
 
 # run the program
-mpirun -np $PROCESSES ./distributed_cpu.exe $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE
+mpirun -np $NUM_PROCESSES ./distributed_cpu.exe $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE
 
 cp $OUTPUT_NAME $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
 
