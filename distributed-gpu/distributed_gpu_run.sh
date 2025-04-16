@@ -1,8 +1,6 @@
 #!/bin/bash
 #SBATCH --time=24:00:00
-#SBATCH --nodes=2              # Number of nodes
-#SBATCH --ntasks=2            # Total number of Processes
-#SBATCH --gres=gpu:1           # Number of GPUs per node
+#SBATCH --gres=gpu:1                  # Number of GPUs per node
 #SBATCH -o ./%j/slurmjob-%j.out-%N
 #SBATCH -e ./%j/slurmjob-%j.err-%N
 #SBATCH --account=kingspeak-gpu

@@ -94,9 +94,19 @@ cd ../
 # ------------------------------------ Run GPU implementation (Distributed)
 
 cd ./distributed-gpu
-# Parameter List <Data Size> <Block Size>
+# Parameter List <Data Size> <Block Size> <Num Processes>
+sbatch --nodes=2 --ntasks=2 distributed_gpu_run.sh 1000 32 2
+sbatch --nodes=3 --ntasks=3 distributed_gpu_run.sh 1000 32 3
+sbatch --nodes=4 --ntasks=4 distributed_gpu_run.sh 1000 32 4
 
-# Insert calls here
+sbatch --nodes=2 --ntasks=2 distributed_gpu_run.sh 2000 32 2
+sbatch --nodes=3 --ntasks=3 distributed_gpu_run.sh 2000 32 3
+sbatch --nodes=4 --ntasks=4 distributed_gpu_run.sh 2000 32 4
+
+sbatch --nodes=2 --ntasks=2 distributed_gpu_run.sh 6000 32 2
+sbatch --nodes=3 --ntasks=3 distributed_gpu_run.sh 6000 32 3
+sbatch --nodes=4 --ntasks=4 distributed_gpu_run.sh 6000 32 4
+
 
 cd ../
 
