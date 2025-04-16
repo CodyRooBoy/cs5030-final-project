@@ -55,14 +55,21 @@ cd ../
 
 # Insert calls here
 
+cd ./distributed-cpu
+# Parameter List <Data Size> <Number of Processes>
+sbatch run.sh 500 4
+sbatch run.sh 500 8
+sbatch run.sh 500 16
 
+sbatch run.sh 1000 4
+sbatch run.sh 1000 8
+sbatch run.sh 1000 16
 
+sbatch run.sh 2000 4
+sbatch run.sh 2000 8
+sbatch run.sh 2000 16
 
-
-
-
-
-
+cd ../
 
 # -------------------------------- Run GPU implementation (Non-Distributed)
 

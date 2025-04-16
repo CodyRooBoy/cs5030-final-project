@@ -7,8 +7,9 @@
 #SBATCH --partition=kingspeak
 
 # Set up the run
-DATA_SIZE=1000
-OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_serial.raw"
+DATA_SIZE=$1
+NUM_PROCESSES=$2
+OUTPUT_NAME="output_${DATA_SIZE}x${DATA_SIZE}_mpi.raw"
 INPUT_NAME="input_${DATA_SIZE}x${DATA_SIZE}.raw"
 
 # Generate input file with resize tool
@@ -32,7 +33,7 @@ module load gcc/8.5.0 intel-mpi
 make
 
 # run the program
-mpirun -np 8 ./distributed_cpu.exe $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE
+mpirun -np $PROCESSES ./distributed_cpu.exe $INPUT_NAME $OUTPUT_NAME $DATA_SIZE $DATA_SIZE
 
 cp $OUTPUT_NAME $SLURM_SUBMIT_DIR/$SLURM_JOB_ID
 
