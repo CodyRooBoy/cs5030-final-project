@@ -9,7 +9,7 @@ void visible_points(std::vector<uint16_t> &altitude_data, std::vector<uint32_t> 
 	// 	printf("Altitude at (%d,%d) is %d\n", x1, y1, altitude_data[y1 * width + x1]);
 	// }
 
-    std::vector<std::pair<int, int>> pixels = pixelList_new(x1, y1, height, width, 100);
+    std::vector<std::pair<int, int>> pixels = pixelList(x1, y1, height, width, 100);
     for (const auto& pixel : pixels) {
 		// if (x1 == print_point_x && y1 == print_point_y) {
 		// 	printf("looking at (%d,%d)\n", pixel.first, pixel.second);
@@ -161,45 +161,8 @@ float visibility_line_slope(short starting_altitude, short ending_altitude, shor
     return (ending_altitude - starting_altitude) / sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 }
 
+
 std::vector<std::pair<int, int>> pixelList(int x0, int y0, int maxX, int maxY, int radius) {
-
-    // Create a place to store pixel values
-    std::vector<std::pair<int, int>> pixels;
-
-    // Calculate the bounds of the relevant pixel box
-    int starting_y = std::max(y0 - radius, 0);
-    int stopping_y = std::min(radius + y0 + 1, maxY);
-    int starting_x = x0;
-    int stopping_x = std::min(x0 + radius, maxX);
-
-    // std::cout << "starting_y: " << starting_y << std::endl;
-    // std::cout << "stopping_y: " << stopping_y << std::endl;
-    // std::cout << "starting_x: " << starting_x << std::endl;
-    // std::cout << "stopping_x: " << git stopping_x << std::endl; 
-
-
-    // Add relevant pixels to list
-
-    // Select each row starting with row x0
-    // Move along each row starting with y0 - radius or 0 (whichever is greater)
-    // add each point to the list, stop when y == radius + y0 + 1 or y == maxY (whichever is smaller)
-    // If you are on row x0, dont add any points until the y value of the point you are on is greater than the input point y0 value
-    // stop going down when x == x0 + radius or x == maxX (whichever is smaller)
-
-	for (int x = starting_x; x < stopping_x; x++) {
-		for (int y = starting_y; y < stopping_y; y++) {
-			if (x == starting_x && y <= y0) continue;		
-            pixels.emplace_back(x, y);
-        }
-    }
-
-    // This code assumes x values go up and down and y values go across
-
-    return pixels;
-}
-
-
-std::vector<std::pair<int, int>> pixelList_new(int x0, int y0, int maxX, int maxY, int radius) {
 
 	// Create a place to store pixel values
     std::vector<std::pair<int, int>> pixels;

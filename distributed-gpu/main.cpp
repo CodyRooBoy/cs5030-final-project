@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
  
     // Rank 0 use items
     const char* input_filename;
-    const char* output_filename = argv[2];
+    const char* output_filename;
     uint16_t* complete_altitude_data;
     int* visibility_data;
     Point* process_data_start_points = new Point[num_processes];
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
     if (rank == 0) {
         // Reading in parameters
         input_filename = argv[1];
-        // output_filename = argv[2];
+        output_filename = argv[2];
         complete_data_height = std::stoi(argv[3]);
         complete_data_width = std::stoi(argv[4]);
         block_w_h = std::stoi(argv[5]);
@@ -146,19 +146,9 @@ int main(int argc, char* argv[]) {
  
                     for (int y = 0; y < my_altitude_data_dim.y_height; y++) {
                         for (int x = 0; x < my_altitude_data_dim.x_width; x++) {
-                            // my_altitude_data[y * my_altitude_data_dim.x_width + x] =  complete_altitude_data[(altitude_data_section_xy.y * complete_data_width + altitude_data_section_xy.x) + (y * complete_data_width + x + altitude_data_section_xy.x)]; // (outside) + (inside)
                             my_altitude_data[x + (y * my_altitude_data_dim.x_width)] = complete_altitude_data[(altitude_data_section_xy.x + x) + ((altitude_data_section_xy.y + y) * complete_data_width)];
                         }
                     }
-
-                    // printf("\nRank %d Data:\n", calculated_rank);
-                    // for (int y = 0; y < 10; y++) {
-                    //     for (int x = 0; x < 10; x++) {
-                    //         std::cout << my_altitude_data[x + (y * my_altitude_data_dim.x_width)] << " ";
-                    //     }
-                    //     std::cout << "\n";
-                    // }
-                    // std::cout << "\n";
                    
                     // Unless the rank is 0, in which case just calculate your own data and don't send it to anyone
                     if (calculated_rank != 0) {
@@ -173,7 +163,6 @@ int main(int argc, char* argv[]) {
     // All other processes receive the data
     if (rank != 0) {
         MPI_Recv(my_altitude_data, my_altitude_data_dim.x_width * my_altitude_data_dim.y_height, MPI_UINT16_T, 0, 0, comm, MPI_STATUS_IGNORE);
-        // printf("Rank %d got it all okay!\n", rank);
     }    
  
     // define a visibility data structure for this process
@@ -188,7 +177,6 @@ int main(int argc, char* argv[]) {
  
     dimensions block_size = {block_w_h, block_w_h};
     run_visibility_search(my_altitude_data, my_altitude_data_dim, my_left_offset, my_from_points_dim, offset_pairs, block_size, my_visibility_data, rank);
-    // printf("Rank %d finished running the visibility search\n", rank);
     MPI_Barrier(comm);
     fflush(stdout);
     
@@ -212,67 +200,11 @@ int main(int argc, char* argv[]) {
     fflush(stdout);
     MPI_Barrier(comm);
 
-    // // print out my visibility data for rank 0
-    // if (rank == 0) {
-    //     printf("\nPrinting out visibility data for rank 0\n");
-    //     for (int y = 0; y < my_altitude_data_dim.y_height; y++) {
-    //         for (int x = 0; x < my_altitude_data_dim.x_width; x++) {
-    //             std::cout << visibility_data[x + (y * my_altitude_data_dim.x_width)] << " ";
-    //         }
-    //         std::cout << "\n";
-    //     }
-    // }
-    // fflush(stdout);
-    // MPI_Barrier(comm);
-    // // print out my visibility data for rank 1
-    // if (rank == 1) {
-    //     printf("\nPrinting out visibility data for rank 1\n");
-    //     for (int y = 0; y < my_altitude_data_dim.y_height; y++) {
-    //         for (int x = 0; x < my_altitude_data_dim.x_width; x++) {
-    //             std::cout << my_visibility_data[x + (y * my_altitude_data_dim.x_width)] << " ";
-    //         }
-    //         std::cout << "\n";
-    //     }
-    // }
-    // fflush(stdout);
-    // MPI_Barrier(comm);
-    // // print out my visibility data for rank 2
-    // if (rank == 2) {
-    //     printf("\nPrinting out visibility data for rank 2\n");
-    //     for (int y = 0; y < my_altitude_data_dim.y_height; y++) {
-    //         for (int x = 0; x < my_altitude_data_dim.x_width; x++) {
-    //             std::cout << my_visibility_data[x + (y * my_altitude_data_dim.x_width)] << " ";
-    //         }
-    //         std::cout << "\n";
-    //     }
-    // }
-    // fflush(stdout);
-    // MPI_Barrier(comm);
-    // // print out my visibility data for rank 3
-    // if (rank == 3) {
-    //     printf("\nPrinting out visibility data for rank 3\n");
-    //     for (int y = 0; y < my_altitude_data_dim.y_height; y++) {
-    //         for (int x = 0; x < my_altitude_data_dim.x_width; x++) {
-    //             std::cout << my_visibility_data[x + (y * my_altitude_data_dim.x_width)] << " ";
-    //         }
-    //         std::cout << "\n";
-    //     }
-    // }
-    // fflush(stdout);
-    // MPI_Barrier(comm);
-
-
-
-
     // Send back the visibility data to rank 0
     if (rank != 0) {
         // Send back the visibility data you calculated
-        // printf("Rank %d sending data to rank 0 with data size %d\n", rank, my_altitude_data_dim.x_width * my_altitude_data_dim.y_height);
         MPI_Send(my_visibility_data, my_altitude_data_dim.x_width * my_altitude_data_dim.y_height, MPI_INT, 0, 0, comm);
     }
-    
-    // printf("Is this even happening? Rank %d\n", rank);
-    fflush(stdout);
 
     // Rank 0 receives the visibility data from all other ranks
     if (rank == 0) {
@@ -282,21 +214,8 @@ int main(int argc, char* argv[]) {
             // Allocate space for the data
             int* temp_visibility_data = (int*)malloc(temp_altitude_data_size * sizeof(int));
             // Receive the data
-            // printf("Rank %d receiving data from rank %d with data size %d\n", rank, i, temp_altitude_data_size);
             MPI_Recv(temp_visibility_data, temp_altitude_data_size, MPI_INT, i, 0, comm, MPI_STATUS_IGNORE);
             
-            // printf("Printing out Rank %d received data: \n", i);
-            // for (int y = 0; y < process_data_dimensions[i].y_height; y++) {
-            //     for (int x = 0; x < process_data_dimensions[i].x_width; x++) {
-            //         printf("%d ", temp_visibility_data[x + (y * process_data_dimensions[i].x_width)]);
-            //     }
-            //     printf("\n");
-            // }
-            // printf("\n");
-
-            // printf("Process data dim: %d, %d\n", process_data_dimensions[i].x_width, process_data_dimensions[i].y_height);
-            // printf("Process data start points: %d, %d\n", process_data_start_points[i].x, process_data_start_points[i].y);
- 
             // Copy the data into the correct location in the visibility data array
             for (int y = 0; y < process_data_dimensions[i].y_height; y++) {
                 for (int x = 0; x < process_data_dimensions[i].x_width; x++) {
@@ -309,9 +228,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // printf("What about this? Rank %d\n", rank);
     MPI_Barrier(comm);
-    fflush(stdout);
  
     // Puttin' the visibilty data into a uint32_t array
     if (rank == 0) {
@@ -321,7 +238,6 @@ int main(int argc, char* argv[]) {
         }
 
         // Writing out visiblity data
-        // printf("Writing the visibility data to file called %s\n", output_filename);
         fflush(stdout);
         std::ofstream out_file(output_filename, std::ios::binary);
         if (!out_file) {

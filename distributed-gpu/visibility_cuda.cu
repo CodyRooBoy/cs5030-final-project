@@ -15,21 +15,6 @@ int* run_visibility_search(
         int* visibility_results,
         int rank) {
 
-    
-    // if (rank == 2) {
-    //     printf("\nPrinting out Rank 2 altitude running visibility algorithm in cuda:\n");
-    //     for (int y = 0; y < altitude_dim.y_height; y++) {
-    //         for (int x = 0; x < altitude_dim.x_width; x++) {
-    //             printf("%d ", altitude_data[x + (y * altitude_dim.x_width)]);
-    //         }
-    //         printf("\n");
-    //     }
-    //     printf("Printing out other Rank 2 information:\n");
-    //     printf("Left offset: %d\n", left_offset);
-    //     printf("From point dimensions: %d, %d\n", from_point_dim.x_width, from_point_dim.y_height);
-    //     printf("Block dimensions: %d, %d\n", block_dim.x_width, block_dim.y_height);
-    // }
-
     // Allocate memory for Altitude data
     uint16_t* altitude_data_d;
     int altitude_data_size = altitude_dim.x_width * altitude_dim.y_height;
@@ -62,7 +47,7 @@ int* run_visibility_search(
     cudaGetDeviceCount(&device_count);
     // cudaSetDevice(rank % device_count);
     cudaSetDevice(0);
-    printf("Rank %d going to device %d\n", rank, (rank % device_count));
+    // printf("Rank %d going to device %d\n", rank, (rank % device_count));
 
     get_visibility_gpu<<<grid_dim, input_block_dim>>>(
         altitude_data_d,
@@ -88,16 +73,6 @@ int* run_visibility_search(
     // Copy the from point visibility results back to the host
     int* from_point_visibility = (int*)malloc(from_point_dim.x_width * from_point_dim.y_height * sizeof(int));
     cudaMemcpy(from_point_visibility, from_point_visibility_d, from_point_dim.x_width * from_point_dim.y_height * sizeof(int), cudaMemcpyDeviceToHost);
-
-    // if (rank == 2) {
-    //     printf("\nPrinting out Rank 2 from_point data before combining:\n");
-    //     for (int y = 0; y < altitude_dim.y_height; y++) {
-    //         for (int x = 0; x < altitude_dim.x_width; x++) {
-    //             printf("%d ", from_point_visibility[x + (y * from_point_dim.x_width)]);
-    //         }
-    //         printf("\n");
-    //     }
-    // }
     
     // Combine the from_point data and to_point data
     for (int x = 0; x < from_point_dim.x_width; x++) {
@@ -105,16 +80,6 @@ int* run_visibility_search(
             visibility_results[y * altitude_dim.x_width + x + left_offset] += from_point_visibility[y * from_point_dim.x_width + x];
         }
     }
-
-    // if (rank == 2) {
-    //     printf("\nPrinting out Rank 2 visibilty data after combining:\n");
-    //     for (int y = 0; y < altitude_dim.y_height; y++) {
-    //         for (int x = 0; x < altitude_dim.x_width; x++) {
-    //             printf("%d ", visibility_results[x + (y * altitude_dim.x_width)]);
-    //         }
-    //         printf("\n");
-    //     }
-    // }
 
     return 0;
 }

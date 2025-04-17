@@ -3,8 +3,8 @@
 #SBATCH --gres=gpu:1                  # Number of GPUs per node
 #SBATCH -o ./%j/slurmjob-%j.out-%N
 #SBATCH -e ./%j/slurmjob-%j.err-%N
-#SBATCH --account=kingspeak-gpu
-#SBATCH --partition=kingspeak-gpu
+#SBATCH --account=lonepeak-gpu
+#SBATCH --partition=lonepeak-gpu
 
 # Parameter List <Data Size> <Block Size> <Num Processes>
 

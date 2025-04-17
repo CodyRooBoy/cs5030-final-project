@@ -42,7 +42,7 @@ make
 ```
 
 ### Parallel Shared Memory CPU Implementation
-The parallel shared memory CPU implementation is in the [`threads`](/threads/) subdirectory. To compile and run the code on the Kingspeak CHPC cluster, run the `threads_run.sh` Bash script along with the argument for the width and height of the output file.
+The parallel shared memory CPU implementation is in the [`shared-cpu`](/shared-cpu/) subdirectory. To compile and run the code on the Kingspeak CHPC cluster, run the `threads_run.sh` Bash script along with the argument for the width and height of the output file.
 
 ```bash
 cd threads/
@@ -112,6 +112,16 @@ mpirun -np 8 ./distributed_cpu.exe 1000x1000.raw output_1000x1000_mpi.raw 1000 1
 ```
 
 ### Distributed Memory GPU Implementation
+The parallel distributed memory GPU implementation is in the [`distributed-gpu`](/distributed-gpu/) subdirectory. You will need to compile and run the code on the Lonepeak CHPC cluster by running the `distributed_gpu_run.sh` Bash script. You will need to append an argument for the width and height of the output file, the block size used, as well as the number of processes to run.
+
+```bash
+cd distributed-gpu/
+# sbatch --nodes=<Num Processes> --ntasks=<Num Processes> distributed_gpu_run.sh <Data Size> <Block Size> <Num Processes>
+sbatch --nodes=2 --ntasks=2 distributed_gpu_run.sh 1000 32 2
+```
+
+The script will schedule a job on the Lonepeak CHPC cluster. The output file will be created in a subdirectory that is named the SLURM Job ID.
+
 
 ## Our Approach
 
