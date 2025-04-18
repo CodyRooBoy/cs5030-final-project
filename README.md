@@ -172,9 +172,9 @@ g++ validate_datasets.cpp -o validate
 | 1000 x 1000  | 2              | 3313.19    |
 | 1000 x 1000  | 4              | 1562.93    |
 | 1000 x 1000  | 8              | 679.77     |
-| 2000 x 2000  | 2              | -          |
 | 2000 x 2000  | 4              | -          |
 | 2000 x 2000  | 8              | -          |
+| 2000 x 2000  | 16             | -          |
 
 ---
 
@@ -196,13 +196,23 @@ g++ validate_datasets.cpp -o validate
 
 ### Distributed Memory GPU
 
-| Input Size   | Process Count | Time (s)   |
+| Input Size   | Process Count  | Time (s)   |
 |--------------|----------------|------------|
-| -            | -              | -          |
+| 1000x1000    | 2              | 9.9        |
+| 1000x1000    | 3              | 6.9        |
+| 1000x1000    | 4              | 5.1        |
+| 2000x2000    | 2              | 37.0       |
+| 2000x2000    | 3              | 25.0       |
+| 2000x2000    | 4              | 19.1       |
+| 6000x6000    | 2              | 346.9      |
+| 6000x6000    | 3              | 231.9      |
+| 6000x6000    | 4              | 168.8      |
+
 
 ## Output Visualization
 Here is the visualization of the given dataset (using ImageJ, 16-bit signed, little Endian): ![Original Image](images/Original%20Image.png)
 
 Here is the visualization of the full 6000 x 6000 output image (created by the GPU implementation), (using ImageJ, 32-bit unsigned, little Endian): ![Final Image](images/Final%20Image.png)
 
-## Task Assignments
+## Task Assignment Breakdown
+
