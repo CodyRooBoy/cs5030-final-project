@@ -30,8 +30,8 @@ cd ./distributed-cpu
 # sbatch distributed_cpu_run.sh 1000 8
 # sbatch distributed_cpu_run.sh 1000 16
 
-sbatch --nodes=2distributed_cpu_run.sh 2000 4
-sbatch  --nodes=2distributed_cpu_run.sh 2000 8
-sbatch  --nodes=2distributed_cpu_run.sh 2000 16
+sbatch --nodes=2 distributed_cpu_run.sh 2000 4
+sbatch  --nodes=2 distributed_cpu_run.sh 2000 8
+sbatch  --nodes=2 distributed_cpu_run.sh 2000 16
 
 cd ../
