@@ -122,9 +122,87 @@ sbatch --nodes=2 --ntasks=2 distributed_gpu_run.sh 1000 32 2
 
 The script will schedule a job on the Lonepeak CHPC cluster. The output file will be created in a subdirectory that is named the SLURM Job ID.
 
+### Validation Tool
+The validation tool under [`tools`](/tools/) can be used to verify that the output is identical between the serial implementation and the other implementations (the dimensions of the output files have to be the same).
+
+```bash
+cd tools/
+g++ validate_datasets.cpp -o validate
+
+./validate serial_output.raw other_output.raw 1000 1000
+# The tool will respond with a statement either confirming or denying that the files are identical
+```
 
 ## Our Approach
 
 ## Scaling Study
+### Serial Execution (CPU)
+
+| Input Size   | Time (s)   |
+|--------------|------------|
+| 500 x 500    | 2052.03    |
+| 1000 x 1000  | 9719.37    |
+| 2000 x 2000  | 44245.5    |
+
+---
+
+### Shared Memory CPU
+
+| Input Size   | Thread Count | Time (s)   |
+|--------------|--------------|------------|
+| 500 x 500    | 4            | 544.182    |
+| 500 x 500    | 8            | 277.982    |
+| 500 x 500    | 16           | 127.546    |
+| 1000 x 1000  | 4            | 2645.26    |
+| 1000 x 1000  | 8            | 1127.73    |
+| 1000 x 1000  | 16           | 579.894    |
+| 2000 x 2000  | 4            | 10319.6    |
+| 2000 x 2000  | 8            | 5274.65    |
+| 2000 x 2000  | 16           | 2645.26    |
+
+---
+
+### Distributed Memory CPU
+
+| Input Size   | Process Count | Time (s)   |
+|--------------|----------------|------------|
+| 500 x 500    | 4              | -          |
+| 500 x 500    | 8              | -          |
+| 500 x 500    | 16             | -          |
+| 1000 x 1000  | 4              | -          |
+| 1000 x 1000  | 8              | -          |
+| 1000 x 1000  | 16             | -          |
+| 2000 x 2000  | 4              | -          |
+| 2000 x 2000  | 8              | -          |
+| 2000 x 2000  | 16             | -          |
+
+---
+
+### Single GPU
+
+| Input Size   | Block Size | Time (s)   |
+|--------------|------------|------------|
+| 500 x 500    | 5          | 9.6799     |
+| 500 x 500    | 15         | 8.45232    |
+| 500 x 500    | 32         | 8.16161    |
+| 2000 x 2000  | 5          | 166.564    |
+| 2000 x 2000  | 15         | 162.665    |
+| 2000 x 2000  | 32         | 154.93     |
+| 6000 x 6000  | 5          | 1588.69    |
+| 6000 x 6000  | 15         | 1557.78    |
+| 6000 x 6000  | 32         | 1369.6     |
+
+---
+
+### Distributed Memory GPU
+
+| Input Size   | Process Count | Time (s)   |
+|--------------|----------------|------------|
+| -            | -              | -          |
 
 ## Output Visualization
+Here is the visualization of the given dataset (using ImageJ, 16-bit signed, little Endian): ![Original Image](images/Original%20Image.png)
+
+Here is the visualization of the full 6000 x 6000 output image (created by the GPU implementation), (using ImageJ, 32-bit unsigned, little Endian): ![Final Image](images/Final%20Image.png)
+
+## Task Assignments
