@@ -19,6 +19,17 @@ chmod +x ./master_run.sh
 ./master_run.sh
 ```
 
+### Resize Tool
+The resize tool under [`tools`](/tools/) can be used to take the original 6000 x 6000 image and resize it to smaller datasizes that can be used for quicker runtime if running manually.
+
+```bash
+cd tools/
+g++ resize_datasets.cpp -o resize
+
+# ./validate <input file name> <input height> <input width> <output file name> <output height> <output width>
+./validate 6000x6000.raw 6000 6000 1000x1000.raw 1000 1000
+```
+
 ### Serial CPU Implementation
 The serial CPU implementation is in the [`serial`](/serial/) subdirectory. To compile and run the code on the Kingspeak CHPC cluster, run the `serial_run.sh` Bash script along with the argument for the width and height of the output file.
 
