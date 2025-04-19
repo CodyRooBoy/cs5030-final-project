@@ -260,3 +260,18 @@ Here is the visualization of the full 6000 x 6000 output image (created by the G
 
 ## Task Assignment Breakdown
 
+*Tasks are taken from the Project Tasks assignment submitted earlier in the semester*
+
+| Task                                                                  | Brandon  | Enoch    |
+|-----------------------------------------------------------------------|----------|----------|
+| Understanding what the output will be                                 | ✔️       |     ✔️   |
+| Understanding Bresenham's algorithm                                   |  ✔️      |          |
+| Creating the serial implementation                                    | ✔️       |          |
+| Creating the parallel shared memory implementation (CPU)              |          | ✔️       |
+| Creating the parallel shared memory implementation (GPU)              |          |  ✔️      |
+| Creating the distributed memory implementation (CPU)                  |    ✔️    |          |
+| Creating the distributed memory implementation (GPU)                  |           | ✔️      |
+| Creating the Validation and Resize Tools                              |           |  ✔️     |
+| Writing the documentation on running the project |                    | ✔️       |          |
+| Completing the scaling studies                                        |     ✔️   |          |
+| Writing a report on the approach for the implementations and results (with visualizations of the results) |     ✔️     |     ✔️    |
