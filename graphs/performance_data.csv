@@ -1,0 +1,40 @@
+﻿Method,Input Size,Threads/Processes/Block Size,Time (s)
+Serial,500 x 500,NaN,2052.03
+Serial,1000 x 1000,NaN,9719.37
+Serial,2000 x 2000,NaN,44245.5
+Shared Memory CPU,500 x 500,4,544.182
+Shared Memory CPU,500 x 500,8,277.982
+Shared Memory CPU,500 x 500,16,127.546
+Shared Memory CPU,1000 x 1000,4,2645.26
+Shared Memory CPU,1000 x 1000,8,1127.73
+Shared Memory CPU,1000 x 1000,16,579.894
+Shared Memory CPU,2000 x 2000,4,10319.6
+Shared Memory CPU,2000 x 2000,8,5274.65
+Shared Memory CPU,2000 x 2000,16,2645.26
+Distributed Memory CPU,500 x 500,4,
+Distributed Memory CPU,500 x 500,8,
+Distributed Memory CPU,500 x 500,16,
+Distributed Memory CPU,1000 x 1000,4,
+Distributed Memory CPU,1000 x 1000,8,
+Distributed Memory CPU,1000 x 1000,16,
+Distributed Memory CPU,2000 x 2000,4,
+Distributed Memory CPU,2000 x 2000,8,
+Distributed Memory CPU,2000 x 2000,16,
+Single GPU,500 x 500,5,9.6799
+Single GPU,500 x 500,15,8.45232
+Single GPU,500 x 500,32,8.16161
+Single GPU,2000 x 2000,5,166.564
+Single GPU,2000 x 2000,15,162.665
+Single GPU,2000 x 2000,32,154.93
+Single GPU,6000 x 6000,5,1588.69
+Single GPU,6000 x 6000,15,1557.78
+Single GPU,6000 x 6000,32,1369.6
+Distributed Memory GPU,1000x1000,2,9.9
+Distributed Memory GPU,1000x1000,3,6.9
+Distributed Memory GPU,1000x1000,4,5.1
+Distributed Memory GPU,2000x2000,2,37
+Distributed Memory GPU,2000x2000,3,25
+Distributed Memory GPU,2000x2000,4,19.1
+Distributed Memory GPU,6000x6000,2,346.9
+Distributed Memory GPU,6000x6000,3,231.9
+Distributed Memory GPU,6000x6000,4,168.8

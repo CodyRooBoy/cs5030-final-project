@@ -188,6 +188,8 @@ g++ validate_datasets.cpp -o validate
 | 1000 x 1000  | 9719.37    |
 | 2000 x 2000  | 44245.5    |
 
+![Serial Execution (CPU) Implementation Graph](graphs/plots/Serial_Method_Performance.png)
+
 ---
 
 ### Shared Memory CPU
@@ -203,6 +205,8 @@ g++ validate_datasets.cpp -o validate
 | 2000 x 2000  | 4            | 10319.6    |
 | 2000 x 2000  | 8            | 5274.65    |
 | 2000 x 2000  | 16           | 2645.26    |
+
+![Shared Memory CPU Implementation Graph](graphs/plots/Shared_Memory_CPU_Performance.png)
 
 ---
 
@@ -220,6 +224,8 @@ g++ validate_datasets.cpp -o validate
 | 2000 x 2000  | 8              | -          |
 | 2000 x 2000  | 16             | -          |
 
+![Distributed Memory CPU Implementation Graph](graphs/plots/Distributed_Memory_CPU_Performance.png)
+
 ---
 
 ### Single GPU
@@ -235,6 +241,8 @@ g++ validate_datasets.cpp -o validate
 | 6000 x 6000  | 5          | 1588.69    |
 | 6000 x 6000  | 15         | 1557.78    |
 | 6000 x 6000  | 32         | 1369.6     |
+
+![Single GPU Implementation Graph](graphs/plots/Single_GPU_Performance.png)
 
 ---
 
@@ -252,6 +260,7 @@ g++ validate_datasets.cpp -o validate
 | 6000x6000    | 3              | 231.9      |
 | 6000x6000    | 4              | 168.8      |
 
+![ Distributed Memory GPU Implementation Graph](graphs/plots/Distributed_Memory_GPU_Performance.png)
 
 ## Output Visualization
 Here is the visualization of the given dataset (using ImageJ, 16-bit signed, little Endian): ![Original Image](images/Original%20Image.png)

@@ -39,3 +39,6 @@
 
 # macOS Garbage
 .DS_Store
+
+# Python Virtual Environments
+env/
