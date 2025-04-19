@@ -135,6 +135,22 @@ g++ validate_datasets.cpp -o validate
 
 ## Our Approach
 
+### Serial
+
+#### Shared CPU
+
+The shared memory CPU implementation utilized c++ threads. Each thread is given a list of points for which to calculate the visibility score. All threads access the same altitutde and visibility data structures. The visibility code from the serial implementation is used for the actual calculation. 
+
+#### Shared GPU
+
+For the shared memory GPU implementation each thread inside the GPU is given a single point for which to calculate the visibility score. Within each block, every thread runs through the same list of offset points and checks their visibility. This roughly makes the required processing for each point/thread line up with eachother. All threads across all blocks read from/write to the same altitude and visibility data structures in global memory.
+
+#### Distributed CPU
+
+#### Distributed GPU
+
+The distributed GPU implementation nearly the exact same CUDA code as the shared GPU implementation. To begin, the altitude data is split up and the given to as many MPI processes as needed. These sub sections are then passed to each GPU along with which part of that subsection needs to have its visibility data calculated. The calculated visibility data is then returned to the root process and combined.
+
 ## Scaling Study
 ### Serial Execution (CPU)
 
