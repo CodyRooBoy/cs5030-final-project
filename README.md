@@ -135,21 +135,38 @@ g++ validate_datasets.cpp -o validate
 
 ## Our Approach
 
-### Serial
+## **Serial Implementation**
 
-#### Shared CPU
+- **How it works:** Bresenham's Algorithm is used to trace a "visibility path" between two points on a terrain.
+- **What happens:** As the algorithm moves along the path, it calculates the "altitude" (height) of the path at each step. Then it checks if the terrain at that point blocks the visibility. If the terrain is higher than the visibility line, the visibility is blocked.
+- **Outcome:** If there are no blocks along the path, it increments the "visibility count" for the starting point. This happens for each point in the dataset, processed one by one.
 
-The shared memory CPU implementation utilized c++ threads. Each thread is given a list of points for which to calculate the visibility score. All threads access the same altitutde and visibility data structures. The visibility code from the serial implementation is used for the actual calculation. 
+---
 
-#### Shared GPU
+## **Shared CPU**
 
-For the shared memory GPU implementation each thread inside the GPU is given a single point for which to calculate the visibility score. Within each block, every thread runs through the same list of offset points and checks their visibility. This roughly makes the required processing for each point/thread line up with eachother. All threads across all blocks read from/write to the same altitude and visibility data structures in global memory.
+- **How it works:** This implementation uses **C++ threads** to parallelize the work. Each thread is assigned a group of points and calculates their visibility independently.
+- **What happens:** All threads share the same memory where the terrain's altitude and visibility data are stored. The same visibility calculation code from the serial implementation is used for each thread.
+- **Outcome:** Threads work concurrently, speeding up the overall process by splitting the work, but the data is shared and accessed by all threads, meaning synchronization is needed to avoid conflicts.
 
-#### Distributed CPU
+## **Shared GPU**
 
-#### Distributed GPU
+- **How it works:** The GPU implementation splits the work across **threads** within **blocks** on the GPU. Each thread is given a single point and calculates its visibility score.
+- **What happens:** Inside each block, all threads will check the visibility of a group of points, ensuring the workload aligns across the threads. The threads access shared memory (which is faster but limited in size) to perform calculations.
+- **Outcome:** This method leverages the massive parallel processing power of the GPU, where all threads work simultaneously, but access to memory is shared, meaning synchronization is crucial to avoid overwriting data.
 
-The distributed GPU implementation nearly the exact same CUDA code as the shared GPU implementation. To begin, the altitude data is split up and the given to as many MPI processes as needed. These sub sections are then passed to each GPU along with which part of that subsection needs to have its visibility data calculated. The calculated visibility data is then returned to the root process and combined.
+## **Distributed CPU**
+
+- **How it works:** This implementation uses **MPI** (Message Passing Interface) to distribute the workload across **multiple processors** (CPUs), each working on a different subset of data.
+- **What happens:** The original dataset (the terrain's altitude data) is split across different processes (CPUs). Each CPU works on a subset of points, calculates the visibility for those points, and then at the end, the results are combined into one final output.
+- **Outcome:** The workload is distributed across many processors, allowing for greater scalability and faster computation compared to the serial method. This is useful for large datasets that can't fit in a single machine's memory.
+
+## **Distributed GPU**
+
+- **How it works:** Similar to the **Shared GPU** implementation, but now it combines **MPI** with **CUDA** to distribute the workload across multiple GPUs in a distributed system.
+- **What happens:** The terrain data is split and sent to different MPI processes (each process controls a GPU). Each GPU then handles a section of the data and calculates visibility for that part.
+- **Outcome:** Once the GPUs finish their calculations, the results are sent back to a central process (the "root" process) and combined. This allows for even larger datasets and faster processing by leveraging multiple GPUs across multiple machines.
+
 
 ## Scaling Study
 ### Serial Execution (CPU)
